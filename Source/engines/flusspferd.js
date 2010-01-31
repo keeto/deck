@@ -56,7 +56,28 @@ var Engine = {
 	},
 
 	parseRequest: function(req){
-		/* TODO: Zest Parser */
+		var request = {};
+
+		request.scheme = req.scheme;
+		request.version = req.version;
+
+		request.method = req.method;
+		request.scriptName = req.scriptName;
+		request.pathInfo = req.pathInfo;
+		request.queryString = req.queryString;
+		request.host = req.host;
+		request.port = req.port;
+		request.env = this.requestEnv || {};
+
+		request.headers = Object.clone(req.headers);
+
+		request.input = req.input;
+		request.post = {};
+		request.get = {};
+		request.cookie = {};
+		request.files = {};
+		request.original = req;
+		return request;
 	}
 
 };

@@ -88,7 +88,7 @@ var Engine = {
 		request.get = {};
 		request.cookie = {};
 		request.files = {};
-		request.origReq = req;
+		request.original = req;
 		return request;
 	}
 

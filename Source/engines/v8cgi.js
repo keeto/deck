@@ -76,7 +76,7 @@ var Engine = {
 		request.get = req.get;
 		request.cookie = req.cookie;
 		request.files = req.files;
-		request.origReq = req;
+		request.original = req;
 		return request;
 	}
 
