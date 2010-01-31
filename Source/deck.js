@@ -1,3 +1,21 @@
+// warnings: no
+/*
+---
+
+script: deck.js
+
+description: the main deck importer script.
+
+license: MIT-style license
+
+authors:
+- Mark Obcena
+
+provides: [setup]
+
+...
+*/
+
 exports.setup = function(global, engineName, options){
 	var Deck, path, loadModules, engine, 
 		name, klass, module, manifest;
