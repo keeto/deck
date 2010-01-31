@@ -76,7 +76,7 @@ var Engine = {
 		request.queryString = uri.query;
 		request.host = host_port[0];
 		request.port = host_port[1];
-		request.env = {};
+		request.env = this.requestEnv || {};
 
 		request.headers = {};
 		for (var i in req.headers) {

@@ -16,10 +16,17 @@ provides: [setup]
 ...
 */
 
+(function() {
+
+var deck = {
+	version: [0, 5, 0]
+};
+
 exports.setup = function(global, engineName, options){
 	var Deck, path, loadModules, engine, 
 		name, klass, module, manifest;
 
+	// Default configurations
 	options = options || {};
 	path = options.path || '.';
 	loadModules = (options.loadModules != undefined) ? options.loadModules : true;
@@ -27,14 +34,23 @@ exports.setup = function(global, engineName, options){
 	enginePath = options.enginePath || path + '/engines/';
 	vendorPath = options.vendorPath || path + '/thirdparty/';
 
+	// Hail MooTools!
 	require(vendorPath + 'mootools').into(global);
 
-	if ((typeof engineName) === 'object') engine = global.Engine = engineName;
-	else engine = global.Engine = require(enginePath + engineName).engine;
-	engine.deckPath = path;
-	engine.global = global;
+	// The Engine Global
+	if ((typeof engineName) === 'object'){
+		engine = global.Engine = engineName;
+	} else {
+		engine = global.Engine = require(enginePath + engineName).engine;
+	}
 
+	engine.global = global;
+	engine.deckPath = path;
+	engine.requestEnv = {deck: deck};
+
+	// Here comes Deck!
 	Deck = require(path + '/lib/base').Base;
+	Deck.Info = deck;
 
 	manifest = (loadModules) ? require(modulePath + 'manifest').Modules : {};
 	for (name in manifest){
@@ -50,3 +66,5 @@ exports.setup = function(global, engineName, options){
 
 	return Deck;
 };
+
+})();

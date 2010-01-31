@@ -64,7 +64,7 @@ var Engine = {
 		request.queryString = req.QUERY_STRING;
 		request.host = sysenv.HTTP_HOST;
 		request.port = sysenv.SERVER_PORT;
-		request.env = {};
+		request.env = this.requestEnv || {};
 
 		request.headers = {};
 		for (var i in req._headers) {
