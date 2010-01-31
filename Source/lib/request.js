@@ -30,7 +30,7 @@ var Request = new Class({
 	input: null,
 	headers: {},
 	env: {},
-	origReq: {},
+	original: {},
 
 	stopped: false,
 
@@ -89,17 +89,17 @@ var Request = new Class({
 
 	// for node
 	setBodyEncoding: function(encoding){
-		if (this.origReq.setBodyEncoding) this.origReq.setBodyEncoding(encoding);
+		if (this.original.setBodyEncoding) this.original.setBodyEncoding(encoding);
 		return this;
 	},
 
 	pause: function(encoding){
-		if (this.origReq.pause) this.origReq.pause(encoding);
+		if (this.original.pause) this.original.pause(encoding);
 		return this;
 	},
 
 	resume: function(encoding){
-		if (this.origReq.resume) this.origReq.resume(encoding);
+		if (this.original.resume) this.original.resume(encoding);
 		return this;
 	}
 

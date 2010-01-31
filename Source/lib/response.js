@@ -22,12 +22,12 @@ var Response = new Class({
 	$headers: {},
 	$body: [],
 	$status: 200,
-	origResp: {},
+	original: {},
 
 	finished: false,
 
 	initialize: function(resp){
-		if (resp) this.origResp = resp;
+		if (resp) this.original = resp;
 	},
 
 	setHeader: function(key, value){
@@ -88,21 +88,21 @@ var Response = new Class({
 	// for node
 	sendHeader: function(status, headers){
 		this.setStatus(status || this.$status).setHeaders(headers || {});
-		if (this.origResp.sendHeader) this.origResp.sendHeader(this.$status, this.$headers);
+		if (this.original.sendHeader) this.original.sendHeader(this.$status, this.$headers);
 		return this;
 	},
 
 	sendBody: function(data, encoding){
 		this.puts(data);
-		if (this.origResp.sendBody) {
-			this.origResp.sendBody(this.$body.join(''), encoding);
+		if (this.original.sendBody) {
+			this.original.sendBody(this.$body.join(''), encoding);
 			this.$body = [];
 		}
 		return this;
 	},
 
 	finish: function(){
-		if (this.origResp.finish) this.origResp.finish();
+		if (this.original.finish) this.original.finish();
 		this.finished = true;
 		return this.clean();
 	}
