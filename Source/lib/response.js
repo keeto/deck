@@ -102,8 +102,8 @@ var Response = new Class({
 	},
 
 	finish: function(){
-		if (this.original.finish) this.original.finish();
 		this.finished = true;
+		if (this.original.finish) this.original.finish();
 		return this.clean();
 	}
 

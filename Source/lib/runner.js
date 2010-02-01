@@ -27,6 +27,8 @@ var	Request 	= require('./request').Request,
 
 Runner = new Class({
 
+	autoFinish: false,
+
 	run: function(env, resp){
 		var parsedEnv 	= Engine.parseRequest(env),
 			request 	= new Request(parsedEnv),
@@ -43,6 +45,7 @@ Runner = new Class({
 			modules[i](request, response);
 			if (request.stopped || response.finished) break;
 		}
+		if (self.autoFinish && !response.finished) response.finish();
 	}
 
 });

@@ -51,6 +51,7 @@ Base = new Class({
 		options = options || {};
 		if (options.app instanceof Function) this.App = options.app;
 		if (options.modules) this.setModules(options.modules);
+		this.autoFinish = options.autoFinish;
 	},
 
 	'protected setModules': function(modules){
