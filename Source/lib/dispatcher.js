@@ -33,6 +33,7 @@ Dispatcher = new Class({
 		var parsedEnv 	= Engine.parseRequest(env),
 			request 	= new Request(parsedEnv),
 			response 	= new Response(resp);
+		request.env.deck.method = 'dispatch';
 		this.start(request, response);
 		return response.clean();
 	},

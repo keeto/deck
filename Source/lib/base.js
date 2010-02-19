@@ -55,9 +55,13 @@ Base = new Class({
 	},
 	
 	setApp: function(app, bind){
-		if (app.dispatch instanceof Function) this.$app = app.dispatch.bind(bind || app);
-		else if (app.run instanceof Function) this.$app = app.run.bind(bind || app);
-		else if (app instanceof Function) this.$app = app.bind(bind || this);
+		if (app instanceof Function){
+			this.$app = app.bind(bind);
+		} else if (app.dispatch instanceof Function){
+			this.$app = app.dispatch.bind(bind || app);
+		} else if (app.run instanceof Function){
+			this.$app = app.run.bind(bind || app);
+		}
 		return this;
 	},
 

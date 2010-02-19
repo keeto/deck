@@ -33,6 +33,7 @@ Runner = new Class({
 		var parsedEnv 	= Engine.parseRequest(env),
 			request 	= new Request(parsedEnv),
 			response 	= new Response(resp);
+		request.env.deck.method = 'run';
 		this.iterate(request, response);
 		return response.clean();
 	},
