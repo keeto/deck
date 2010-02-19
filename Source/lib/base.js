@@ -45,13 +45,20 @@ Base = new Class({
 		Events
 	],
 
-	App: null,
+	$app: null,
 
 	initialize: function(options){
 		options = options || {};
-		if (options.app instanceof Function) this.App = options.app;
+		if (options.app) this.setApp(options.app);
 		if (options.modules) this.setModules(options.modules);
 		this.autoFinish = options.autoFinish;
+	},
+	
+	setApp: function(app, bind){
+		if (app.dispatch instanceof Function) this.$app = app.dispatch.bind(bind || app);
+		else if (app.run instanceof Function) this.$app = app.run.bind(bind || app);
+		else if (app instanceof Function) this.$app = app.bind(bind || this);
+		return this;
 	},
 
 	'protected setModules': function(modules){

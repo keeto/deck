@@ -38,7 +38,7 @@ Runner = new Class({
 	},
 
 	iterate: function(request, response){
-		var modules = [].concat(this.$pre, [this.App], this.$post),
+		var modules = [].concat(this.$pre, [this.$app], this.$post),
 			i = modules.reverse().length;
 		request.next = function(){};
 		while (i--){

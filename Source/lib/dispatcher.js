@@ -38,7 +38,7 @@ Dispatcher = new Class({
 	},
 
 	start: function(request, response){
-		var self = this, next, modules = [].concat(this.$pre, [this.App], this.$post);
+		var self = this, next, modules = [].concat(this.$pre, [this.$app], this.$post);
 		if (modules.length == 0) return;
 		request.next = function(){
 			if (request.stopped || response.finished) return;
