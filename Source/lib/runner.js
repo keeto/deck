@@ -46,7 +46,7 @@ Runner = new Class({
 			modules[i](request, response);
 			if (request.stopped || response.finished) break;
 		}
-		if (self.autoFinish && !response.finished) response.finish();
+		if (this.autoFinish && !response.finished) response.finish();
 	}
 
 });
