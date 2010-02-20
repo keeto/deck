@@ -33,9 +33,13 @@ var Router = new Class({
 
 	cacheRequest: true,
 
-	noRoute: function(request, response){
+	$unrouted: function(request, response){
 		response.setStatus(404);
 		request.next();
+	},
+
+	setUnrouted: function(fn){
+		this.$unrouted = fn;
 	},
 
 	addRoute: function(matcher, func, options){
@@ -84,7 +88,7 @@ var Router = new Class({
 			len, route, matches,
 			captures, params, splat;
 		if (this.isCached(path)) return this.getCached(path, request);
-		if (!routes || routes.length == 0) return this.noRoute;
+		if (!routes || routes.length == 0) return this.$unrouted;
 		len = routes.length;
 		while (len--){
 			route = routes[len];
@@ -112,7 +116,7 @@ var Router = new Class({
 				return route.action;
 			}
 		}
-		return this.noRoute;
+		return this.$unrouted;
 	},
 
 	setCached: function(path, obj){
