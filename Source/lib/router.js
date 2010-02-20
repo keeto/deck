@@ -43,31 +43,46 @@ var Router = new Class({
 	},
 
 	addRoute: function(matcher, func, options){
-		var type = typeOf(matcher), params, form = [], method, len, routes, current;
+		var type = typeOf(matcher), form = [], method, len, routes, current;
 		if (!matcher) return;
-		options = options || {method: ['GET']};
+		options = options || {};
 		if (typeof matcher == 'string'){
-			params = matcher.match(/:([A-Za-z0-9_$]*)|\*/g);
-			if (params){
-				var i = params.length;
-				while (i--){
-					form.unshift(params[i] == '*' ? 'splat' : params[i].substring(1));
-					form = form.filter(function(i){ return i.length; });
-				}
-				matcher = matcher.replace(/:([A-Za-z0-9_$]*)|\*/g, '([^\\\/]*)').replace(/\{/g, '(').replace(/}/g, ')?');
-			}
-			matcher = new RegExp('^' + matcher + '$');
+			var _ = this.prepareMatcher(matcher);
+			matcher = _.matcher; form = _.form;
 		}
-		method = Array.from(options.method);
+		method = Array.from(options.method || ['GET']);
 		len = method.length;
 		while (len--){
 			routes = this.$routes[method[len].toUpperCase()];
 			if (!routes) continue;
-			current = {key: matcher, action: func, type: type, form: form};
+			current = {
+				key: matcher,
+				action: func,
+				type: type,
+				form: form,
+				conditions: options.conditions || {}
+			};
 			routes.push(current);
 			if (method[len] == 'HEAD') this.$routes.HEAD.push(current);
 		}
 		return this;
+	},
+
+	'protected prepareMatcher': function(matcher){
+		var params = matcher.match(/:([A-Za-z0-9_$]*)|\*/g), form = [];
+		if (params){
+			var i = params.length;
+			while (i--){
+				form.unshift(params[i] == '*' ? 'splat' : params[i].substring(1));
+				form = form.filter(function(i){ return i.length; });
+			}
+			matcher = matcher.multiReplace(
+				[(/:([A-Za-z0-9_$]*)|\*/g), '([^\\\/]*)'],
+				[(/\{/g), '('],
+				[(/\}/g), ')?']
+			);
+		}
+		return {matcher: new RegExp('^' + matcher + '$'), form: form};
 	},
 
 	addRoutes: function(items){
@@ -84,55 +99,77 @@ var Router = new Class({
 	matchRoute: function(request){
 		var path = trim(request.pathInfo),
 			method = request.method,
-			routes = this.$routes[method.toUpperCase()],
-			len, route, matches,
-			captures, params, splat;
-		if (this.isCached(path)) return this.getCached(path, request);
+			routes = this.$routes[method.toUpperCase()];
+		if (this.isCached(path, request)) return this.getCached(path, request);
 		if (!routes || routes.length == 0) return this.$unrouted;
+		return this.getMatch(request, path, routes);
+	},
+
+	'protected getMatch': function(request, path, routes){
+		var len, route, matches, captures;
 		len = routes.length;
 		while (len--){
 			route = routes[len];
 			matches = path.match(route.key);
 			if (matches){
-				matches.shift();
-				matches = matches.filter(function(i){ return i && i.indexOf('/') !== 0; });
-				if (route.type == 'regexp'){
-					captures = request.captures = matches;
-				} else {
-					params = request.params = {};
-					splat = request.splat = [];
-					var i = route.form.length;
-					while (i--){
-						if (route.form[i] == 'splat') request.splat.push(matches[i]);
-						else request.params[route.form[i]] = matches[i];
-					}
-				}
-				if (this.cacheRequest) this.setCached(path, {
-					action: route.action,
-					captures: captures,
-					params: params,
-					splat: splat
-				});
+				if (!this.checkConditions(request, route.conditions)) continue;
+				captures = this.getCaptures(request, route, matches);
+				Object.append(request, captures);
+				this.setCached(path, Object.append(captures, {
+					conditions: route.conditions,
+					action: route.action
+				}));
 				return route.action;
 			}
 		}
 		return this.$unrouted;
 	},
 
-	setCached: function(path, obj){
-		this.$cache[path] = obj;
+	'protected getCaptures': function(request, route, matches){
+		var result = {captures: [], params: {}, splat: []};
+		matches.shift();
+		matches = matches.filter(function(i){
+			return i && i.indexOf('/') !== 0;
+		});
+		if (route.type == 'regexp'){
+			result.captures = matches;
+		} else {
+			var i = route.form.length;
+			while (i--){
+				if (route.form[i] == 'splat') result.splat.push(matches[i]);
+				else result.params[route.form[i]] = matches[i];
+			}
+		}
+		return result;
+	},
+
+	'protected checkConditions': function(request, conditions){
+		for (var key in conditions){
+			var type = typeOf(conditions[key]);
+			if ((type == 'string' && conditions[key] !== request[key])
+				|| (type == 'regexp' && !request[key].test(conditions[key]))
+				|| (type == 'function' && !Function.stab(function(){
+						return conditions[key](request[key]);
+				}))) return false;
+		}
+		return true;
+	},
+
+	'protected setCached': function(path, obj){
+		if (this.cacheRequest) this.$cache[path] = obj;
 		return this;
 	},
 
-	getCached: function(path, request){
+	'protected getCached': function(path, request){
 		request.captures = this.$cache[path].captures;
 		request.params = this.$cache[path].params;
 		request.splat = this.$cache[path].splat;
 		return this.$cache[path].action;
 	},
 
-	isCached: function(path){
-		return (this.cacheRequest && this.$cache[path]);
+	isCached: function(path, request){
+		return (this.cacheRequest && this.$cache[path])
+				&& this.checkConditions(request, this.$cache[path].conditions);
 	}
 
 });
