@@ -78,7 +78,7 @@ var Router = new Class({
 			}
 			matcher = matcher.multiReplace(
 				[(/:([A-Za-z0-9_$]*)|\*/g), '([^\\\/]+)'],
-				[(/\{/g), '('],
+				[(/\{/g), '(?:'],
 				[(/\}/g), ')?']
 			);
 		}
