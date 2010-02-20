@@ -88,13 +88,16 @@ var Response = new Class({
 	// for node
 	sendHeader: function(status, headers){
 		this.setStatus(status || this.$status).setHeaders(headers || {});
-		if (this.original.sendHeader) this.original.sendHeader(this.$status, this.$headers);
+		if (this.original.sendHeader){
+			this.original.sendHeader(this.$status, this.$headers);
+			this.headerSent = true;
+		}
 		return this;
 	},
 
 	sendBody: function(data, encoding){
 		if (data) this.puts(data);
-		if (this.original.sendBody) {
+		if (this.original.sendBody){
 			this.original.sendBody(this.$body.join(''), encoding);
 			this.$body = [];
 		}
@@ -103,7 +106,8 @@ var Response = new Class({
 
 	finish: function(){
 		if (this.finished) return this.clean();
-		this.sendHeader().sendBody();
+		if (!this.headerSent) this.sendHeader();
+		this.sendBody();
 		this.finished = true;
 		if (this.original.finish) this.original.finish();
 		return this.clean();
