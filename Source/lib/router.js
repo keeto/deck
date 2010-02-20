@@ -84,7 +84,7 @@ var Router = new Class({
 	matchRoute: function(request){
 		var path = trim(request.pathInfo),
 			method = request.method,
-			routes = this.$routes[method],
+			routes = this.$routes[method.toUpperCase()],
 			len, route, matches,
 			captures, params, splat;
 		if (this.isCached(path)) return this.getCached(path, request);
