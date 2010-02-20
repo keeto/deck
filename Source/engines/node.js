@@ -32,15 +32,6 @@ var Engine = {
 
 	setTimeout: setTimeout,
 
-	isFile: function(name){
-		try {
-			var stat = require('posix').stat(name).wait();
-			return stat.isFile();
-		} catch(e){
-			return false;
-		}
-	},
-
 	writeOut: function(str){
 		return process.stdio.write(str + '\n');
 	},

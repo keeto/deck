@@ -25,12 +25,8 @@ var Engine = {
 	args: system.args,
 	deckPath: null,
 	cwd: '',
-	
-	setTimeout: null,
 
-	isFile: function(name){
-		return new File(name).isFile();
-	},
+	setTimeout: null,
 
 	writeOut: function(str){
 		return system.stdout(str + '\n');

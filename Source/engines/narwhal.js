@@ -26,8 +26,6 @@ var Engine = {
 	deckPath: null,
 	cwd: '',
 
-	isFile: function(name){},
-
 	writeOut: function(str){},
 
 	writeErr: function(str){},
