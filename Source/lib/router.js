@@ -128,9 +128,6 @@ var Router = new Class({
 	'protected getCaptures': function(request, route, matches){
 		var result = {captures: [], params: {}, splat: []};
 		matches.shift();
-		matches = matches.filter(function(i){
-			return i && i.indexOf('/') !== 0;
-		});
 		if (route.type == 'regexp'){
 			result.captures = matches;
 		} else {
