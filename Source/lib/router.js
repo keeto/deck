@@ -44,7 +44,7 @@ var Router = new Class({
 
 	addRoute: function(matcher, func, options){
 		var type = typeOf(matcher), form = [], method, len, routes, current;
-		if (!matcher) return;
+		if (!matcher) return this;
 		options = options || {};
 		if (typeof matcher == 'string'){
 			var _ = this.prepareMatcher(matcher);

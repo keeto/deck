@@ -1,3 +1,4 @@
+// warnings: no
 /*=
 name: Core
 description: The heart of MooTools.

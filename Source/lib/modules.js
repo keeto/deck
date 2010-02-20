@@ -158,7 +158,7 @@ var Modules = new Class({
 	},
 
 	disableAllModules: function(){
-		if (this.$mods) return;
+		if (this.$mods) return this;
 		this.$mods = {
 			pre: this.$pre,
 			post: this.$post
@@ -168,7 +168,7 @@ var Modules = new Class({
 	},
 
 	enableAllModules: function(){
-		if (!this.$mods) return;
+		if (!this.$mods) return this;
 		this.$pre = this.$mods.pre;
 		this.$post = this.$mods.post;
 		delete this.$mods;
