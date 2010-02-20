@@ -49,8 +49,10 @@ Base = new Class({
 
 	initialize: function(options){
 		options = options || {};
-		if (options.app) this.setApp(options.app);
 		if (options.modules) this.setModules(options.modules);
+		if (options.routes && typeOf(options.routes) == 'array') this.addRoutes(options.routes);
+		else if (options.app) this.setApp(options.app);
+		
 		this.autoFinish = options.autoFinish;
 	},
 
