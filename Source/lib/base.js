@@ -23,6 +23,7 @@ provides: [Base]
 (function(){
 
 var	Modules		= require('./modules').Modules,
+	Router		= require('./router').Router,
 	Runner		= require('./runner').Runner,
 	Dispatcher	= require('./dispatcher').Dispatcher,
 	Request 	= require('./request').Request,
@@ -40,12 +41,11 @@ Base = new Class({
 
 	Implements: [
 		Modules,
+		Router,
 		Runner,
 		Dispatcher,
 		Events
 	],
-
-	$app: null,
 
 	initialize: function(options){
 		options = options || {};
@@ -53,16 +53,14 @@ Base = new Class({
 		if (options.modules) this.setModules(options.modules);
 		this.autoFinish = options.autoFinish;
 	},
-	
-	setApp: function(app, bind){
-		if (app instanceof Function){
-			this.$app = app.bind(bind);
-		} else if (app.dispatch instanceof Function){
-			this.$app = app.dispatch.bind(bind || app);
-		} else if (app.run instanceof Function){
-			this.$app = app.run.bind(bind || app);
-		}
+
+	setApp: function(app){
+		this.matchRoute = function(){ return app; }
 		return this;
+	},
+
+	buildStack: function(request){
+		return [].concat(this.$pre, [this.matchRoute(request)], this.$post);
 	},
 
 	'protected setModules': function(modules){
