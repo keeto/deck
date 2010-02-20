@@ -79,9 +79,9 @@ var Response = new Class({
 		}
 
 		return {
-			headers: this.headers,
-			body: Array.from(this.body),
-			status: (this.status * 1)
+			headers: headers,
+			body: Array.from(body),
+			status: (status * 1)
 		};
 	},
 
