@@ -53,6 +53,7 @@ Base = new Class({
 		if (options.routes && typeOf(options.routes) == 'array') this.addRoutes(options.routes);
 		else if (options.app) this.setApp(options.app);
 		
+		this.cacheRequest = options.cacheRequest != undefined ? options.cacheRequest : true;
 		this.autoFinish = options.autoFinish;
 	},
 

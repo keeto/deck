@@ -29,6 +29,10 @@ var Router = new Class({
 		GET: [], POST: [], PUT: [], DELETE: [], HEAD: []
 	},
 
+	$cache: {},
+
+	cacheRequest: true,
+
 	noRoute: function(request, response){
 		response.setStatus(404);
 		request.next();
@@ -47,7 +51,6 @@ var Router = new Class({
 					form = form.filter(function(i){ return i.length; });
 				}
 				matcher = matcher.replace(/:([A-Za-z0-9_$]*)|\*/g, '([^\\\/]*)').replace(/\{/g, '(').replace(/}/g, ')?');
-				Engine.writeOut(matcher.toString());
 			}
 			matcher = new RegExp('^' + matcher + '$');
 		}
@@ -78,7 +81,9 @@ var Router = new Class({
 		var path = trim(request.pathInfo),
 			method = request.method,
 			routes = this.$routes[method],
-			len, route, matches;
+			len, route, matches,
+			captures, params, splat;
+		if (this.isCached(path)) return this.getCached(path, request);
 		if (!routes || routes.length == 0) return this.noRoute;
 		len = routes.length;
 		while (len--){
@@ -86,22 +91,44 @@ var Router = new Class({
 			matches = path.match(route.key);
 			if (matches){
 				matches.shift();
-				matches = matches.filter(function(i){ return i && i.indexOf('/') !== 0; })
+				matches = matches.filter(function(i){ return i && i.indexOf('/') !== 0; });
 				if (route.type == 'regexp'){
-					request.captures = matches;
+					captures = request.captures = matches;
 				} else {
-					request.params = {};
-					request.splat = [];
+					params = request.params = {};
+					splat = request.splat = [];
 					var i = route.form.length;
 					while (i--){
 						if (route.form[i] == 'splat') request.splat.push(matches[i]);
 						else request.params[route.form[i]] = matches[i];
 					}
 				}
+				if (this.cacheRequest) this.setCached(path, {
+					action: route.action,
+					captures: captures,
+					params: params,
+					splat: splat
+				});
 				return route.action;
 			}
 		}
 		return this.noRoute;
+	},
+
+	setCached: function(path, obj){
+		this.$cache[path] = obj;
+		return this;
+	},
+
+	getCached: function(path, request){
+		request.captures = this.$cache[path].captures;
+		request.params = this.$cache[path].params;
+		request.splat = this.$cache[path].splat;
+		return this.$cache[path].action;
+	},
+
+	isCached: function(path){
+		return (this.cacheRequest && this.$cache[path]);
 	}
 
 });
