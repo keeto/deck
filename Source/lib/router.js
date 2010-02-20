@@ -31,26 +31,38 @@ var Router = new Class({
 
 	noRoute: function(request, response){
 		response.setStatus(404);
-		request.next(); 
+		request.next();
 	},
 
 	addRoute: function(matcher, func, options){
-		var method, len, routes, current;
+		var type = typeOf(matcher), params, form = [], method, len, routes, current;
 		if (!matcher) return;
 		options = options || {method: ['GET']};
-		if (typeof matcher == 'string') matcher = new RegExp('^' + matcher + '$');
+		if (typeof matcher == 'string'){
+			params = matcher.match(/:([A-Za-z0-9_$]*)|\*/g);
+			if (params){
+				var i = params.length;
+				while (i--){
+					form.unshift(params[i] == '*' ? 'splat' : params[i].substring(1));
+					form = form.filter(function(i){ return i.length; });
+				}
+				matcher = matcher.replace(/:([A-Za-z0-9_$]*)|\*/g, '([^\\\/]*)').replace(/\{/g, '(').replace(/}/g, ')?');
+				Engine.writeOut(matcher.toString());
+			}
+			matcher = new RegExp('^' + matcher + '$');
+		}
 		method = Array.from(options.method);
 		len = method.length;
 		while (len--){
 			routes = this.$routes[method[len].toUpperCase()];
 			if (!routes) continue;
-			current = {key: matcher, action: func};
+			current = {key: matcher, action: func, type: type, form: form};
 			routes.push(current);
 			if (method[len] == 'HEAD') this.$routes.HEAD.push(current);
 		}
 		return this;
 	},
-	
+
 	addRoutes: function(items){
 		var len, current;
 		items = Array.from(items);
@@ -66,12 +78,26 @@ var Router = new Class({
 		var path = trim(request.pathInfo),
 			method = request.method,
 			routes = this.$routes[method],
-			len, route;
+			len, route, matches;
 		if (!routes || routes.length == 0) return this.noRoute;
 		len = routes.length;
 		while (len--){
 			route = routes[len];
-			if (path.test(route.key)) {
+			matches = path.match(route.key);
+			if (matches){
+				matches.shift();
+				matches = matches.filter(function(i){ return i && i.indexOf('/') !== 0; })
+				if (route.type == 'regexp'){
+					request.captures = matches;
+				} else {
+					request.params = {};
+					request.splat = [];
+					var i = route.form.length;
+					while (i--){
+						if (route.form[i] == 'splat') request.splat.push(matches[i]);
+						else request.params[route.form[i]] = matches[i];
+					}
+				}
 				return route.action;
 			}
 		}
