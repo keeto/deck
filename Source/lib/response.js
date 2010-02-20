@@ -93,7 +93,7 @@ var Response = new Class({
 	},
 
 	sendBody: function(data, encoding){
-		this.puts(data);
+		if (data) this.puts(data);
 		if (this.original.sendBody) {
 			this.original.sendBody(this.$body.join(''), encoding);
 			this.$body = [];
@@ -102,6 +102,8 @@ var Response = new Class({
 	},
 
 	finish: function(){
+		if (this.finished) return this.clean();
+		this.sendHeader().sendBody();
 		this.finished = true;
 		if (this.original.finish) this.original.finish();
 		return this.clean();
