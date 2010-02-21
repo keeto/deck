@@ -69,7 +69,7 @@ var Router = new Class({
 	},
 
 	'protected prepareMatcher': function(matcher){
-		var params = matcher.match(/:([A-Za-z0-9_$]*)|\*/g), form = [];
+		var params = matcher.match(/:([A-Za-z_][A-Za-z0-9_$]+)|\*/g), form = [];
 		if (params){
 			var i = params.length;
 			while (i--){
@@ -77,7 +77,7 @@ var Router = new Class({
 				form = form.filter(function(i){ return i.length; });
 			}
 			matcher = matcher.multiReplace(
-				[(/:([A-Za-z0-9_$]*)|\*/g), '([^\\\/]+)'],
+				[(/:([A-Za-z_][A-Za-z0-9_$]+)|\*/g), '([^\\\/]+)'],
 				[(/\{/g), '(?:'],
 				[(/\}/g), ')?']
 			);
