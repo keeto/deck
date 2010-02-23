@@ -23,8 +23,8 @@ var deck = {
 };
 
 exports.setup = function(global, engineName, options){
-	var Deck, path, loadModules, engine, 
-		name, klass, module, manifest;
+	var Deck, path, loadModules, modulePath, enginePath,
+		vendorPath, engine, name, klass, module, manifest;
 
 	// Default configurations
 	options = options || {};
