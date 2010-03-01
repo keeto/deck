@@ -1,5 +1,5 @@
 var Deck = require('./../Source/deck').setup(GLOBAL, 'node');
-var http = http = require('http');
+var http = require('http');
 
 /* App */
 var Application = function(request, response){
