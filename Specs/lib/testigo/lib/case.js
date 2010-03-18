@@ -15,9 +15,15 @@ var checkArg = require('./utils').checkArg,
 	Expectation = require('./expectation').Expectation;
 
 var countExpect = function(fn){
-	var str = fn.toString(),
-		matches = str.match(/^([^\/])*expect\(|^([^\/])*expect.apply\(|^([^\/])*expect.call\(/gm);
-	return (!matches) ? 0 : matches.length;
+	var str = fn.toString();
+	var matches = str.match(/^[\s\t\n;]*(expect\(|expect.apply\(|expect.call\()/gm);
+	var count = (!matches) ? 0 : matches.length;
+	var perform = str.match(/:perform\s+([0-9]+)/g);
+	if (perform){
+		var performCount = (perform.pop().replace(/:perform\s+/, '') * 1);
+		if (performCount <= count) return performCount;
+	}
+	return count;
 };
 
 var Case = function(desc, test, context, callback){
@@ -100,9 +106,13 @@ Case.prototype.run = function(){
 	if (this.$callbacks.before instanceof Function)
 		this.$callbacks.before.call(self, this.desc, this.$testCount);
 	try {
-		this.$test.call(this.$context, function(){
+		var expectProto = function(){
 			return self.$expect.apply(self, Array.prototype.slice.call(arguments));
-		});
+		};
+		expectProto.perform = function(num){
+			if (!isNaN(num)) self.$testCount = num;
+		};
+		this.$test.call(this.$context, expectProto);
 	} catch(e){
 		error = e;
 	} finally {
