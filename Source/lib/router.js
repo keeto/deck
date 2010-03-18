@@ -87,7 +87,6 @@ var Router = new Class({
 			if (matches){
 				if (!route.conforms(request)) continue;
 				var captures = route.getCaptures(path);
-				Engine.writeOut(JSON.encode(captures));
 				Object.append(request, captures);
 				this.setCached(path, route, captures);
 				return route.action;
