@@ -17,6 +17,8 @@ provides: [Router]
 
 (function(){
 
+var Route = require('./route').Route;
+
 var trim = function(path){
 	var slash = path.lastIndexOf('/');
 	if (path.length != 1 && slash == path.length - 1) return path.substring(0, slash);
@@ -43,46 +45,18 @@ var Router = new Class({
 	},
 
 	addRoute: function(matcher, func, options){
-		var type = typeOf(matcher), form = [], method, len, routes, current;
 		if (!matcher) return this;
 		options = options || {};
-		if (typeof matcher == 'string'){
-			var _ = this.prepareMatcher(matcher);
-			matcher = _.matcher; form = _.form;
-		}
-		method = Array.from(options.method || ['GET']);
-		len = method.length;
+		matcher = new Route(matcher, func, options.conditions);
+		var methods = Array.from(options.method || ['GET']);
+		var len = methods.length, routes;
 		while (len--){
-			routes = this.$routes[method[len].toUpperCase()];
+			routes = this.$routes[methods[len].toUpperCase()];
 			if (!routes) continue;
-			current = {
-				key: matcher,
-				action: func,
-				type: type,
-				form: form,
-				conditions: options.conditions || {}
-			};
-			routes.push(current);
-			if (method[len] == 'HEAD') this.$routes.HEAD.push(current);
+			routes.push(matcher);
+			if (methods[len] == 'HEAD') this.$routes.HEAD.push(current);
 		}
 		return this;
-	},
-
-	'protected prepareMatcher': function(matcher){
-		var params = matcher.match(/:([A-Za-z_][A-Za-z0-9_$]+)|\*/g), form = [];
-		if (params){
-			var i = params.length;
-			while (i--){
-				form.unshift(params[i] == '*' ? 'splat' : params[i].substring(1));
-				form = form.filter(function(i){ return i.length; });
-			}
-			matcher = matcher.multiReplace(
-				[(/:([A-Za-z_][A-Za-z0-9_$]+)|\*/g), '([^\\\/]+)'],
-				[(/\{/g), '(?:'],
-				[(/\}/g), ')?']
-			);
-		}
-		return {matcher: new RegExp('^' + matcher + '$'), form: form};
 	},
 
 	addRoutes: function(items){
@@ -106,67 +80,39 @@ var Router = new Class({
 	},
 
 	'protected getMatch': function(request, path, routes){
-		var len, route, matches, captures;
-		len = routes.length;
+		var len = routes.length;
 		while (len--){
-			route = routes[len];
-			matches = path.match(route.key);
+			var route = routes[len];
+			var matches = route.matches(path);
 			if (matches){
-				if (!this.checkConditions(request, route.conditions)) continue;
-				captures = this.getCaptures(request, route, matches);
+				if (!route.conforms(request)) continue;
+				var captures = route.getCaptures(path);
+				Engine.writeOut(JSON.encode(captures));
 				Object.append(request, captures);
-				this.setCached(path, Object.append(captures, {
-					conditions: route.conditions,
-					action: route.action
-				}));
+				this.setCached(path, route, captures);
 				return route.action;
 			}
 		}
 		return this.$unrouted;
 	},
 
-	'protected getCaptures': function(request, route, matches){
-		var result = {captures: [], params: {}, splat: []};
-		matches.shift();
-		if (route.type == 'regexp'){
-			result.captures = matches;
-		} else {
-			var i = route.form.length;
-			while (i--){
-				if (route.form[i] == 'splat') result.splat.push(matches[i]);
-				else result.params[route.form[i]] = matches[i];
-			}
-		}
-		return result;
-	},
-
-	'protected checkConditions': function(request, conditions){
-		for (var key in conditions){
-			var type = typeOf(conditions[key]);
-			if ((type == 'string' && conditions[key] !== request[key])
-				|| (type == 'regexp' && !request[key].test(conditions[key]))
-				|| (type == 'function' && !Function.stab(function(){
-						return conditions[key](request[key]);
-				}))) return false;
-		}
-		return true;
-	},
-
-	'protected setCached': function(path, obj){
-		if (this.cacheRequest) this.$cache[path] = obj;
+	'protected setCached': function(path, route, captures){
+		if (this.cacheRequest) this.$cache[path] = {
+			route: route,
+			captures: captures
+		};
 		return this;
 	},
 
 	'protected getCached': function(path, request){
-		request.captures = this.$cache[path].captures;
-		request.params = this.$cache[path].params;
-		request.splat = this.$cache[path].splat;
-		return this.$cache[path].action;
+		request.captures = this.$cache[path].captures.captures;
+		request.params = this.$cache[path].captures.params;
+		request.splat = this.$cache[path].captures.splat;
+		return this.$cache[path].route.action;
 	},
 
 	isCached: function(path, request){
-		return (this.cacheRequest && this.$cache[path])
-				&& this.checkConditions(request, this.$cache[path].conditions);
+		return this.cacheRequest && this.$cache[path] && this.$cache[path].route.conforms(request);
 	}
 
 });
