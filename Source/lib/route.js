@@ -75,11 +75,11 @@ var Route = new Class({
 		var conditions = this.conditions;
 		for (var key in conditions){
 			var type = typeOf(conditions[key]);
-			if ((type == 'string' && conditions[key] !== params[key])
-				|| (type == 'regexp' && !params[key].test(conditions[key]))
-				|| (type == 'function' && !Function.stab(function(){
-					return conditions[key](params[key], params);
-				}))) return false;
+			if (type == 'string' && (!params[key] || conditions[key] !== params[key])) return false;
+			if (type == 'regexp' && (!params[key] || !params[key].test(conditions[key]))) return false;
+			if (type == 'function' && !Function.stab(function(){
+					return conditions[key](params[key] || null, params);
+				})) return false;
 		}
 		return true;
 	}
