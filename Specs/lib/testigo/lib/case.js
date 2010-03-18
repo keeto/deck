@@ -16,7 +16,7 @@ var checkArg = require('./utils').checkArg,
 
 var countExpect = function(fn){
 	var str = fn.toString(),
-		matches = str.match(/expect\(|expect.apply\(|expect.call\(/g);
+		matches = str.match(/^([^\/])*expect\(|^([^\/])*expect.apply\(|^([^\/])*expect.call\(/gm);
 	return (!matches) ? 0 : matches.length;
 };
 
