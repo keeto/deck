@@ -47,6 +47,10 @@ Runner = new Class({
 			if (request.stopped || response.finished) break;
 		}
 		if (this.autoFinish && !response.finished) response.finish();
+	},
+
+	buildStack: function(){
+		return [];
 	}
 
 });

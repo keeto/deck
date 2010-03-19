@@ -52,6 +52,10 @@ Dispatcher = new Class({
 			else deferred();
 		};
 		request.next();
+	},
+
+	buildStack: function(){
+		return [];
 	}
 
 });
