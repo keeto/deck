@@ -19,6 +19,13 @@ Class.defineMutator('Static', function(items){
 	this.extend(items);
 });
 
+Options.pick = function(){
+	for (var i = 0, l = arguments.length; i < l; i++){
+		if (arguments[i] != undefined) return arguments[i];
+	}
+	return null;
+};
+
 String.implement({
 
 	multiReplace: function(){
