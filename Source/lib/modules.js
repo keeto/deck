@@ -38,8 +38,8 @@ var Modules = new Class({
 	},
 
 	removePreHandler: function(handler, all){
-		var result = [], found = false;
-			len = this.$pre.length;
+		var result = [], found = false,
+			len = this.$pre.reverse().length;
 		while (len--){
 			var item = this.$pre[len];
 			if (item !== handler || (!all && found == true)) result.push(item);
@@ -61,7 +61,7 @@ var Modules = new Class({
 			len = this.$post.length;
 		while (len--){
 			var item = this.$post[len];
-			if (item !== handler || (!all && found == true)) result.push(item);
+			if (item !== handler || (!all && found == true)) result.unshift(item);
 			else found = true;
 		}
 		this.$post = result;
