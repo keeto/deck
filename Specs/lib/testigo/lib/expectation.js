@@ -19,18 +19,28 @@ var prepareNot = function(exp){
 	exp.not = {};
 	for (var matcher in Expectation.Matchers) (function(matcher){
 		exp.not[matcher] = function(expected){
-			var result = !Expectation.Matchers[matcher].call(null, exp._received, expected);
-			exp._callback.call(exp._bound, result, exp._received, expected, 'not.' + matcher);
+			var result = !Expectation.Matchers[matcher].call(null, exp.$received, expected);
+			exp.$callback.call(exp.$bound, result, exp.$received, expected, 'not.' + matcher);
 			return result;
 		};
 	})(matcher);
 };
 
 var Expectation = function(value, callback, bound){
-	this._received = value;
-	this._callback = callback || function(){};
-	this._bound = bound || this;
+	this.$received = value;
+	this.$callback = callback || function(){};
+	this.$bound = bound || this;
 	prepareNot(this);
+};
+
+Expectation.setMatcher = function(name, func){
+	if (func === undefined || !(func instanceof Function))
+		throw new Error('Expectation.setMatcher requires a function as its second argument.');
+	Expectation.prototype[name] = function(expected){
+		var result = func.call(null, this.$received, expected);
+		this.$callback.call(this.$bound, result, this.$received, expected, matcher);
+		return result;
+	};
 };
 
 Expectation.Matchers = {
@@ -127,15 +137,7 @@ Expectation.Matchers = {
 
 };
 
-for (var matcher in Expectation.Matchers) (function(matcher){
-
-	Expectation.prototype[matcher] = function(expected){
-		var result = Expectation.Matchers[matcher].call(null, this._received, expected);
-		this._callback.call(this._bound, result, this._received, expected, matcher);
-		return result;
-	};
-
-})(matcher);
+for (var matcher in Expectation.Matchers) Expectation.setMatcher(matcher, Expectation.Matchers[matcher]);
 
 exports.Expectation = Expectation;
 

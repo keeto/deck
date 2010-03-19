@@ -61,6 +61,26 @@ var callbacks = {
 		this.$print([' (', count, ' Tests):', '\n'].join(''));
 	},
 
+	suiteError: function(suite, count, error){
+		this.$setColor('red');
+		this.$print(' Cannot run tests because of error: \n');
+		this.$setColor();
+		this.$print(['    Error thrown: "', error,'"\n'].join(''));
+		if (this.$stack) {
+			this.$print('       --- Error Details ---\n');
+			this.$print('         Name: ' + error.name + '\n');
+			this.$print('         Stack --- \n');
+			this.$print('         ' + error.stack.split('\n').join('\n         ') + '\n');
+			this.$print('         --------- \n');
+			this.$print('       ---------------------\n');
+		}
+		this.$print(['End ', suite, ': '].join(''));
+		this.$setColor('red');
+		this.$print('Failed');
+		this.$setColor();
+		this.$print(' (Cannot run tests.)\n');
+	},
+
 	afterSuite: function(suite, success, results){
 		this.$print(['End ', suite, ': '].join(''));
 		if (success){

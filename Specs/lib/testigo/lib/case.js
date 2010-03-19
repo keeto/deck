@@ -34,11 +34,15 @@ var Case = function(desc, test, context, callback){
 	this.$test = test;
 	this.$context = context || {};
 
-	callback = callback || {};
 	this.$callbacks = {
+		before: function(){},
+		after: function(){}
+	};
+	callback = callback || {};
+	this.setCallbacks({
 		before: callback.before,
 		after: callback.after
-	};
+	});
 
 	this.$testCount = countExpect(test);
 	this.$doneCount = 0;
@@ -48,12 +52,25 @@ var Case = function(desc, test, context, callback){
 	this.$results = [];
 };
 
+Case.setMatcher = function(name, fn){
+	Expectation.setMatcher(name, fn);
+};
+
 Case.prototype.count = function(){
 	return this.$testCount;
 };
 
 Case.prototype.setCallback = function(type, fn){
+	if (fn === undefined || !(fn instanceof Function))
+		throw new Error('Case.setCallback requires a function as its second argument.');
 	this.$callbacks[type] = fn;
+	return this;
+};
+
+Case.prototype.setCallbacks = function(keys){
+	for (var key in keys){
+		if (keys[key] !== undefined && keys[key] instanceof Function) this.setCallback(key, keys[key]);
+	}
 	return this;
 };
 
@@ -79,9 +96,7 @@ var addResult = function(results, success, done){
 	this.$results.push(results);
 	this.$doneCount++;
 	this[success ? '$passes' : '$failures']++;
-	if (this.done() && this.$callbacks.after instanceof Function){
-		this.$callbacks.after.call(this, this.results(), (this.$failures === 0));
-	}
+	if (this.done()) this.$callbacks.after.call(this, this.results(), (this.$failures === 0));
 };
 
 var expectCallback = function(){
@@ -103,8 +118,7 @@ Case.prototype.$expect = function(received){
 
 Case.prototype.run = function(){
 	var self = this, error;
-	if (this.$callbacks.before instanceof Function)
-		this.$callbacks.before.call(self, this.desc, this.$testCount);
+	this.$callbacks.before.call(self, this.desc, this.$testCount);
 	try {
 		var expectProto = function(){
 			return self.$expect.apply(self, Array.prototype.slice.call(arguments));

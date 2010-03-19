@@ -24,27 +24,57 @@ var Suite = function(name, body, callbacks){
 	this.$results = [];
 	this.$context = {x: 1};
 
-	callbacks = callbacks || {};
 	this.$callbacks = {
+		before: function(){},
+		beforeEach: function(){},
+		after: function(){},
+		afterEach: function(){}
+	};
+	callbacks = callbacks || {};
+	this.setCallbacks({
 		before: callbacks.before,
 		beforeEach: callbacks.beforeEach,
 		after: callbacks.after,
 		afterEach: callbacks.afterEach
-	};
+	});
 
 	this.$testCount = 0;
 	this.$doneCount = 0;
 	this.$passes = 0;
 	this.$failures = 0;
 
-	this.$before = function(){};
-	this.$beforeEach = function(){};
-	this.$after = function(){};
-	this.$afterEach = function(){};
+	this.$scaffolds = {
+		before: function(){},
+		beforeEach: function(){},
+		after: function(){},
+		afterEach: function(){}
+	};
+};
+
+Suite.setMatcher = function(name, fn){
+	Case.setMatcher(name, fn);
+};
+
+Suite.prototype.setCallback = function(type, fn){
+	if (fn === undefined || !(fn instanceof Function))
+		throw new Error('Suite.setCallback requires a function as its second argument.');
+	this.$callbacks[type] = fn;
+	return this;
+};
+
+Suite.prototype.setCallbacks = function(keys){
+	for (var key in keys){
+		if (keys[key] !== undefined && keys[key] instanceof Function) this.setCallback(key, keys[key]);
+	}
+	return this;
 };
 
 Suite.prototype.done = function(){
 	return !(this.$testCount - this.$doneCount);
+};
+
+Suite.prototype.count = function(){
+	return this.$testCount;
 };
 
 Suite.prototype.results = function(){
@@ -64,12 +94,11 @@ Suite.prototype.results = function(){
 var callNext = function(){
 	var current = this.$tests.shift();
 	if (current){
-		this.$beforeEach.call(this.$context);
+		this.$scaffolds.beforeEach.call(this.$context);
 		current.run();
 	} else {
-		this.$after.call(this.$context);
-		if (this.$callbacks.after instanceof Function)
-			this.$callbacks.after.call(null, this.name, (this.$failures === 0), this.results());
+		this.$scaffolds.after.call(this.$context);
+		this.$callbacks.after.call(null, this.name, (this.$failures === 0), this.results());
 	}
 };
 
@@ -79,10 +108,8 @@ var itCallback = function(){
 		self.$doneCount++;
 		self.$results.push(results);
 		self[success ? '$passes' : '$failures']++;
-		self.$afterEach.call(self.$context);
-		if (self.$callbacks.afterEach instanceof Function){
-			self.$callbacks.afterEach.call(null, self.name, results.description, results);
-		}
+		self.$scaffolds.afterEach.call(self.$context);
+		self.$callbacks.afterEach.call(null, self.name, results.description, results);
 		callNext.call(self);
 	};
 };
@@ -92,8 +119,7 @@ Suite.prototype.$it = function(desc, fn){
 	this.$testCount++;
 	var test = new Case(desc, fn, this.$context, {
 		before: function(desc, count){
-			if (self.$callbacks.beforeEach instanceof Function)
-				self.$callbacks.beforeEach.call(null, self.name, desc, count);
+			self.$callbacks.beforeEach.call(null, self.name, desc, count);
 		},
 		after: itCallback.call(this)
 	});
@@ -101,7 +127,7 @@ Suite.prototype.$it = function(desc, fn){
 };
 
 Suite.prototype.$setup = function(type, fn){
-	if (fn instanceof Function) this['$' + type] = fn;
+	if (fn !== undefined && fn instanceof Function) this.$scaffolds[type] = fn;
 	return this;
 };
 
@@ -113,14 +139,13 @@ Suite.prototype.prepare = function(){
 		return self.$setup.apply(self, Array.prototype.slice.call(arguments));
 	});
 	this.$prepared = true;
-	if (this.$callbacks.before instanceof Function)
-		this.$callbacks.before.call(null, this.name, this.$testCount);
+	this.$callbacks.before.call(null, this.name, this.$testCount);
 	return this;
 };
 
 Suite.prototype.run = function(){
 	if (!this.$prepared) this.prepare();
-	this.$before.call(this.$context);
+	this.$scaffolds.before.call(this.$context);
 	callNext.call(this);
 	return this;
 };

@@ -24,26 +24,40 @@ var Testigo = function(callbacks){
 	this.$passes = 0;
 	this.$failures = 0;
 
-	callbacks = callbacks || {};
 	this.$callbacks = {
+		before: function(){},
+		beforeSuite: function(){},
+		beforeTest: function(){},
+		after: function(){},
+		afterSuite: function(){},
+		afterTest: function(){},
+		suiteError: function(){}
+	};
+	callbacks = callbacks || {};
+	this.setCallbacks({
 		before: callbacks.before,
 		beforeSuite: callbacks.beforeSuite,
 		beforeTest: callbacks.beforeTest,
 		after: callbacks.after,
 		afterSuite: callbacks.afterSuite,
-		afterTest: callbacks.afterTest
-	};
+		afterTest: callbacks.afterTest,
+		suiteError: callbacks.suiteError
+	});
 };
 
 Testigo.prototype.setCallback = function(name, fn){
+	if (fn === undefined || !(fn instanceof Function))
+		throw new Error('Testigo.setCallback requires a function as its second argument.');
 	this.$callbacks[name] = fn;
 	return this;
 };
 
 Testigo.prototype.setCallbacks = function(keys){
-	for (var key in keys) this.setCallback(key, keys[key]);
+	for (var key in keys){
+		if (keys[key] !== undefined && keys[key] instanceof Function) this.setCallback(key, keys[key]);
+	}
 	return this;
-}
+};
 
 Testigo.prototype.done = function(){
 	return !(this.$suiteCount - this.$suitesDone);
@@ -69,25 +83,21 @@ Testigo.prototype.describe = function(name, fn){
 	var suite = new Suite(name, fn, {
 		before: function(suite, count){
 			self.$testCount += count;
-			if (self.$callbacks.beforeSuite instanceof Function)
-				self.$callbacks.beforeSuite.call(null, suite, count);
+			self.$callbacks.beforeSuite.call(null, suite, count);
 		},
 		after: function(suite, success, results){
 			self.$suitesDone++;
 			self.$passes += results.tests.passes;
 			self.$failures += results.tests.failures;
 			self.results[suite] = results;
-			if (self.$callbacks.afterSuite instanceof Function)
-				self.$callbacks.afterSuite.call(null, suite, success, results);
+			self.$callbacks.afterSuite.call(null, suite, success, results);
 			callNext.call(self);
 		},
 		beforeEach: function(suite, test, count){
-			if (self.$callbacks.beforeTest instanceof Function)
-				self.$callbacks.beforeTest.call(null, suite, test, count);
+			self.$callbacks.beforeTest.call(null, suite, test, count);
 		},
 		afterEach: function(suite, test, results){
-			if (self.$callbacks.afterTest instanceof Function)
-				self.$callbacks.afterTest.call(null, suite, test, results);
+			self.$callbacks.afterTest.call(null, suite, test, results);
 		}
 	});
 	this.$suites.push(suite);
@@ -96,24 +106,33 @@ Testigo.prototype.describe = function(name, fn){
 var callNext = function(){
 	var current = this.$suites.shift();
 	if (current){
-		current.run();
+		try {
+			current.run();
+		} catch(e){
+			this.$suitesDone++;
+			this.$failures += current.count();
+			this.$callbacks.suiteError.call(null, current.name, current.count(), e);
+			callNext.call(this);
+		}
 	} else {
-		if (this.$callbacks.after instanceof Function)
-			this.$callbacks.after.call(null, (this.$failures === 0), this.results());
+		this.$callbacks.after.call(null, (this.$failures === 0), this.results());
 	}
 };
 
 Testigo.prototype.run = function(){
-	if (this.$callbacks.before instanceof Function)
-		this.$callbacks.before.call(null, this.$suiteCount);
+	this.$callbacks.before.call(null, this.$suiteCount);
 	callNext.call(this);
 };
 
-Testigo.version = [0,1,2];
-Testigo.versionText = "0.1.2";
+Testigo.version = [0,1,5];
+Testigo.versionText = "0.1.5";
 
 Testigo.Runners = {
 	Simple: require('./runners/simple').SimpleRunner
+};
+
+Testigo.setMatcher = Testigo.prototype.setMatcher = function(name, fn){
+	Suite.setMatcher(name, fn);
 };
 
 exports.Testigo = Testigo;
