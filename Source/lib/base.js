@@ -54,8 +54,8 @@ Base = new Class({
 		if (options.modules) this.setModules(options.modules);
 		if (options.unrouted) this.setUnrouted(options.unrouted);
 
-		this.cacheRequest = options.cacheRequest != undefined ? options.cacheRequest : true;
-		this.autoFinish = options.autoFinish;
+		this.cacheRequest = Options.pick(options.cacheRequest, true);
+		this.autoFinish = Options.pick(options.autoFinish, true);
 	},
 
 	setApp: function(app){
