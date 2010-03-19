@@ -23,11 +23,11 @@ var Modules = new Class({
 	$post: [],
 
 	getPreHandlers: function(){
-		return this.$pre;
+		return [].concat(this.$pre);
 	},
 
 	getPostHandlers: function(){
-		return this.$post;
+		return [].concat(this.$post);
 	},
 
 	addPreHandler: function(handler){
