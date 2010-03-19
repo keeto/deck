@@ -57,7 +57,7 @@ var Modules = new Class({
 	},
 
 	removePostHandler: function(handler, all){
-		var result = [], found = false;
+		var result = [], found = false,
 			len = this.$post.length;
 		while (len--){
 			var item = this.$post[len];
