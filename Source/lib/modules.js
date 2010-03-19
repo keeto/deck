@@ -22,156 +22,73 @@ var Modules = new Class({
 	$pre: [],
 	$post: [],
 
-	$disPre: [],
-	$disPost: [],
-
 	addPreHandler: function(handler){
+		if (!(handler instanceof Function))
+			throw new Error('Module.addPreHandler requires a function as an argument');
 		this.$pre.unshift(handler);
 		return this;
 	},
 
 	removePreHandler: function(handler, all){
-		if (all){
-			this.$pre = this.$pre.filter(function(item){
-				return (item !== handler);
-			});
-		} else {
-			var index = this.$pre.indexOf(handler);
-			if (index !== -1) this.$pre.splice(index, 1);
+		var result = [], found = false;
+			len = this.$pre.length;
+		while (len--){
+			var item = this.$pre[len];
+			if (item !== handler || (!all && found == true)) result.push(item);
+			else found = true;
 		}
-		return this;
-	},
-
-	disablePreHandler: function(handler, all){
-		var self = this;
-		if (all){
-			this.$pre = this.$pre.filter(function(item, index){
-				if (item === handler) {
-					self.$disPre.push({fn: item, index: index});
-					return false;
-				}
-				return true;
-			});
-		} else {
-			var index = this.$pre.indexOf(handler);
-			if (index !== -1) {
-				this.$disPre.push({fn: this.$pre.splice(index, 1)[0], index: index});
-			}
-		}
-		return this;
-	},
-
-	enablePreHandler: function(handler, all){
-		var i, self = this;
-		i = this.$disPre.length;
-		while(i--){
-			var item = this.$disPre[i];
-			if (item.fn == handler){
-				this.$pre.splice(item.index, 0, item.fn);
-				this.$disPre.splice(i, 1);
-				if (!all) break;
-			}
-		}
+		this.$pre = result;
 		return this;
 	},
 
 	addPostHandler: function(handler){
+		if (!(handler instanceof Function))
+			throw new Error('Module.addPostHandler requires a function as an argument');
 		this.$post.push(handler);
 		return this;
 	},
 
 	removePostHandler: function(handler, all){
-		if (all){
-			this.$post = this.$post.filter(function(item){
-				return (item !== handler);
-			});
-		} else {
-			var index = this.$post.indexOf(handler);
-			if (index !== -1) this.$post.splice(index, 1);
+		var result = [], found = false;
+			len = this.$post.length;
+		while (len--){
+			var item = this.$post[len];
+			if (item !== handler || (!all && found == true)) result.push(item);
+			else found = true;
 		}
-		return this;
-	},
-
-	disablePostHandler: function(handler, all){
-		var self = this;
-		if (all){
-			this.$post = this.$post.filter(function(item, index){
-				if (item === handler) {
-					self.$disPost.push({fn: item, index: index});
-					return false;
-				}
-				return true;
-			});
-		} else {
-			var index = this.$post.indexOf(handler);
-			if (index !== -1) {
-				this.$disPost.push({fn: this.$post.splice(index, 1)[0], index: index});
-			}
-		}
-		return this;
-	},
-
-	enablePostHandler: function(handler, all){
-		var i, self = this;
-		i = this.$disPost.length;
-		while(i--){
-			var item = this.$disPost[i];
-			if (item.fn == handler){
-				this.$post.splice(item.index, 0, item.fn);
-				this.$disPost.splice(i, 1);
-				if (!all) break;
-			}
-		}
+		this.$post = result;
 		return this;
 	},
 
 	addModule: function(module){
 		if (typeOf(module) === 'object'){
-			if (module.preHandler) this.addPreHandler(module.preHandler);
-			if (module.postHandler) this.addPostHandler(module.postHandler);
+			if (module.preHandler){
+				if (!(module.preHandler instanceof Function))
+					throw new Error('Module.addModule: module.preHandler should be a function.');
+				this.addPreHandler(module.preHandler);
+			}
+			if (module.postHandler){
+				if (!(module.postHandler instanceof Function))
+					throw new Error('Module.addModule: module.postHandler should be a function.');
+				this.addPostHandler(module.postHandler);
+			}
 		}
 		return this;
 	},
 
 	removeModule: function(module){
 		if (typeOf(module) === 'object'){
-			if (module.preHandler) this.removePreHandler(module.preHandler);
-			if (module.postHandler) this.removePostHandler(module.postHandler);
+			if (module.preHandler){
+				if (!(module.preHandler instanceof Function))
+					throw new Error('Module.removeModule: module.preHandler should be a function.');
+				this.removePreHandler(module.preHandler);
+			}
+			if (module.postHandler){
+				if (!(module.postHandler instanceof Function))
+					throw new Error('Module.removeModule: module.postHandler should be a function.');
+				this.removePostHandler(module.postHandler);
+			}
 		}
-		return this;
-	},
-
-	disableModule: function(module){
-		if (typeOf(module) === 'object'){
-			if (module.preHandler) this.disablePreHandler(module.preHandler);
-			if (module.postHandler) this.disablePostHandler(module.postHandler);
-		}
-		return this;
-	},
-
-	enableModule: function(module){
-		if (typeOf(module) === 'object'){
-			if (module.preHandler) this.enablePreHandler(module.preHandler);
-			if (module.postHandler) this.enablePostHandler(module.postHandler);
-		}
-		return this;
-	},
-
-	disableAllModules: function(){
-		if (this.$mods) return this;
-		this.$mods = {
-			pre: this.$pre,
-			post: this.$post
-		};
-		this.$pre = this.$post = [];
-		return this;
-	},
-
-	enableAllModules: function(){
-		if (!this.$mods) return this;
-		this.$pre = this.$mods.pre;
-		this.$post = this.$mods.post;
-		delete this.$mods;
 		return this;
 	}
 
