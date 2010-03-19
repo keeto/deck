@@ -54,7 +54,7 @@ Dispatcher = new Class({
 		request.next();
 	},
 
-	buildStack: function(){
+	'protected buildStack': function(){
 		return [];
 	}
 

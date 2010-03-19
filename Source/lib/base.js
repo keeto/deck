@@ -63,7 +63,7 @@ Base = new Class({
 		return this;
 	},
 
-	buildStack: function(request){
+	'protected buildStack': function(request){
 		return [].concat(this.getPreHandlers(), [this.matchRoute(request)], this.getPostHandlers());
 	},
 

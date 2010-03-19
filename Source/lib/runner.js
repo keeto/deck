@@ -49,7 +49,7 @@ Runner = new Class({
 		if (this.autoFinish && !response.finished) response.finish();
 	},
 
-	buildStack: function(){
+	'protected buildStack': function(){
 		return [];
 	}
 
