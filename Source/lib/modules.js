@@ -22,6 +22,14 @@ var Modules = new Class({
 	$pre: [],
 	$post: [],
 
+	getPreHandlers: function(){
+		return this.$pre;
+	},
+
+	getPostHandlers: function(){
+		return this.$post;
+	},
+
 	addPreHandler: function(handler){
 		if (!(handler instanceof Function))
 			throw new Error('Module.addPreHandler requires a function as an argument');

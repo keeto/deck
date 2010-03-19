@@ -53,7 +53,7 @@ Base = new Class({
 		else if (options.app) this.setApp(options.app);
 		if (options.modules) this.setModules(options.modules);
 		if (options.unrouted) this.setUnrouted(options.unrouted);
-		
+
 		this.cacheRequest = options.cacheRequest != undefined ? options.cacheRequest : true;
 		this.autoFinish = options.autoFinish;
 	},
@@ -64,7 +64,7 @@ Base = new Class({
 	},
 
 	buildStack: function(request){
-		return [].concat(this.$pre, [this.matchRoute(request)], this.$post);
+		return [].concat(this.getPreHandlers(), [this.matchRoute(request)], this.getPostHandlers());
 	},
 
 	'protected setModules': function(modules){
