@@ -24,8 +24,6 @@ var Response = new Class({
 	$status: 200,
 	original: {},
 
-	finished: false,
-
 	initialize: function(resp){
 		if (resp) this.original = resp;
 	},
@@ -56,7 +54,7 @@ var Response = new Class({
 		return this;
 	},
 
-	resetBody: function(data){
+	resetBody: function(){
 		this.$body = [];
 		return this;
 	},
@@ -84,38 +82,29 @@ var Response = new Class({
 			status: (status * 1)
 		};
 	},
-	
+
 	finish: function(){
-		if (this.finished) return this.clean();
-		if (!this.headerSent) this.writeHead();
-		this.write();
-		this.finished = true;
-		if (this.original.close) this.original.close();
+		if (!this.finished){
+			this.flushHeaders().flushBody().close();
+			this.finished = true;
+		}
 		return this.clean();
 	},
 
-	// for node
-	writeHead: function(status, headers){
-		this.setStatus(status || this.$status).setHeaders(headers || {});
-		if (this.original.writeHead){
-			this.original.writeHead(this.$status, this.$headers);
-			this.headerSent = true;
-		}
+	'protected flushHeaders': function(){
+		var original = this.original;
+		if (original.writeHead) original.writeHead(this.$status, this.$headers);
+		this.headerSent = true;
 		return this;
 	},
 
-	write: function(data, encoding){
-		if (data) this.puts(data);
-		if (this.original.write && this.headerSent){
-			this.original.write(this.$body.join(''), encoding);
-			this.$body = [];
-		}
+	'protected flushBody': function(){
+		var original = this.original;
+		if (original.write) original.write(this.$body.join(''));
 		return this;
 	}
 
 });
-
-Response.prototype.close = Response.prototype.finish;
 
 exports.Response = Response;
 
