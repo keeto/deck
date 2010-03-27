@@ -115,6 +115,12 @@ var Response = new Class({
 		var original = this.original;
 		if (original.write) original.write(this.$body.join(''), this.getEncoding());
 		return this;
+	},
+
+	'protected close': function(){
+		var original = this.original;
+		if (original.close) original.close();
+		return this;
 	}
 
 });
