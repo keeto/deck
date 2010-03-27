@@ -27,7 +27,7 @@ var	Request 	= require('./request').Request,
 
 Runner = new Class({
 
-	autoFinish: false,
+	autoFinish: true,
 
 	run: function(env, resp){
 		var parsedEnv 	= Engine.parseRequest(env),

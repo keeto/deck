@@ -27,7 +27,9 @@ var	Request 	= require('./request').Request,
 
 Dispatcher = new Class({
 
-	autoFinish: false,
+	autoFinish: true,
+	dispatchAsync: true,
+	dispatchWait: 10,
 
 	dispatch: function(env, resp){
 		var parsedEnv 	= Engine.parseRequest(env),
@@ -48,7 +50,9 @@ Dispatcher = new Class({
 				if (current) current(request, response);
 				else if (self.autoFinish && !response.finished) response.finish();
 			};
-			if (Engine.setTimeout instanceof Function) setTimeout(deferred, 0);
+			if (self.dispatchAsync && Engine.setTimeout instanceof Function){
+				Engine.setTimeout(deferred, self.dispatchWait || 0);
+			}
 			else deferred();
 		};
 		request.next();

@@ -56,10 +56,12 @@ Base = new Class({
 
 		this.cacheRequest = Options.pick(options.cacheRequest, true);
 		this.autoFinish = Options.pick(options.autoFinish, true);
+		this.dispatchAsync = Options.pick(options.dispatchAsync, true);
+		this.dispatchWait = !isNaN(options.dispatchWait * 1) ? options.dispatchWait : 10;
 	},
 
 	setApp: function(app){
-		this.matchRoute = function(){ return app; }
+		this.matchRoute = function(){ return app; };
 		return this;
 	},
 
