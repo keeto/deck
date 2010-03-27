@@ -19,7 +19,7 @@ provides: [setup]
 (function() {
 
 var deck = {
-	version: [0, 8, 0]
+	version: [0, 8, 1]
 };
 
 exports.setup = function(global, engineName, options){
