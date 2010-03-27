@@ -64,6 +64,19 @@ var Response = new Class({
 		return this;
 	},
 
+	getStatus: function(){
+		return this.$status;
+	},
+
+	setEncoding: function(encoding){
+		this.$encoding = encoding;
+		return this;
+	},
+
+	getEncoding: function(){
+		return this.$encoding || 'ascii';
+	},
+
 	clean: function(){
 		var headers = this.$headers,
 			body = this.$body,
@@ -100,7 +113,7 @@ var Response = new Class({
 
 	'protected flushBody': function(){
 		var original = this.original;
-		if (original.write) original.write(this.$body.join(''));
+		if (original.write) original.write(this.$body.join(''), this.getEncoding());
 		return this;
 	}
 
