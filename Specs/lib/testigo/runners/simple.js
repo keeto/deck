@@ -14,6 +14,8 @@ provides: [SimpleRunner]
 var sys, printer = function(type){
 	switch(type){
 		case 'node': return require('sys').print;
+		case 'helma':
+		case 'ringo':
 		case 'flusspferd':
 			sys = require('system');
 			return function(str){
@@ -27,10 +29,41 @@ var sys, printer = function(type){
 
 var SimpleRunner = function(type, testigo, colors, stack){
 	this.$testigo = testigo;
-	this.$print = printer(type);
+	this.$buffer = [];
+	this.$stdout = printer(type);
 	this.$colors = (colors !== undefined) ? colors : true;
 	this.$stack = (stack !== undefined) ? stack : true;
 	this.addCallbacks();
+};
+
+SimpleRunner.prototype.$setColor = function(color){
+	if (!this.$colors) return this;
+	var colors = {
+		black: '30',
+		red: '31',
+		green: '32', 
+		yellow: '33',
+		blue: '34',
+		magenta: '35',
+		cyan: '36',
+		white: '37'
+	};
+	if (color && colors[color]) this.$print("\u001B[" + colors[color] + "m");
+	else this.$print("\u001B[0m");
+	return this;
+};
+
+SimpleRunner.prototype.$print = function(str){
+	this.$buffer.push(str);
+	return this;
+};
+
+SimpleRunner.prototype.$flush = function(){
+	if (this.$buffer.length !== 0){
+		this.$stdout(this.$buffer.join(''));
+		this.$buffer = [];
+	}
+	return this;
 };
 
 var callbacks = {
@@ -69,9 +102,15 @@ var callbacks = {
 		if (this.$stack) {
 			this.$print('       --- Error Details ---\n');
 			this.$print('         Name: ' + error.name + '\n');
-			this.$print('         Stack --- \n');
-			this.$print('         ' + error.stack.split('\n').join('\n         ') + '\n');
-			this.$print('         --------- \n');
+			if (error.stack) {
+				this.$print('         Stack --- \n');
+				this.$print('         ' + error.stack.split('\n').join('\n         ') + '\n');
+				this.$print('         --------- \n');
+			} else if (error.fileName && error.lineNumber) {
+				this.$print('         Message --- \n');
+				this.$print(['         ', error.message, 'at', error.fileName, ':', error.lineNumber, '\n'].join(' '));
+				this.$print('         --------- \n');
+			}
 			this.$print('       ---------------------\n');
 		}
 		this.$print(['End ', suite, ': '].join(''));
@@ -96,9 +135,7 @@ var callbacks = {
 
 	beforeTest: function(suite, test, count){
 		this.$print(' - ');
-		this.$setColor('yellow');
 		this.$print(test);
-		this.$setColor();
 		this.$print('... ');
 	},
 
@@ -126,9 +163,15 @@ var callbacks = {
 				if (this.$stack) {
 					this.$print('       --- Error Details ---\n');
 					this.$print('         Name: ' + result.error.name + '\n');
-					this.$print('         Stack --- \n');
-					this.$print('         ' + result.error.stack.split('\n').join('\n         ') + '\n');
-					this.$print('         --------- \n');
+					if (result.error.stack) {
+						this.$print('         Stack --- \n');
+						this.$print('         ' + result.error.stack.split('\n').join('\n         ') + '\n');
+						this.$print('         --------- \n');
+					} else if (result.error.fileName && result.error.lineNumber) {
+						this.$print('         Message --- \n');
+						this.$print(['         ', result.error.message, 'at', result.error.fileName, ':', result.error.lineNumber, '\n'].join(' '));
+						this.$print('         --------- \n');
+					}
 					this.$print('       ---------------------\n');
 				}
 			} else {
@@ -145,17 +188,11 @@ SimpleRunner.prototype.addCallbacks = function(){
 	var self = this;
 	for (var key in callbacks) (function(type, fn){
 		self.$testigo.setCallback(type, function(){
-			return fn.apply(self, Array.prototype.slice.call(arguments));
+			var result = fn.apply(self, Array.prototype.slice.call(arguments));
+			self.$flush();
+			return result;
 		});
 	})(key, callbacks[key]);
-};
-
-SimpleRunner.prototype.$setColor = function(color){
-	if (!this.$colors) return this;
-	var colors = {green: "32", red: "31", yellow: "33"};
-	if(color) this.$print("\u001B[" + colors[color] + "m");
-	else this.$print("\u001B[0m");
-	return this;
 };
 
 SimpleRunner.prototype.run = function(){

@@ -124,8 +124,8 @@ Testigo.prototype.run = function(){
 	callNext.call(this);
 };
 
-Testigo.version = [0,1,5];
-Testigo.versionText = "0.1.5";
+Testigo.version = [0,1,6];
+Testigo.versionText = "0.1.6";
 
 Testigo.Runners = {
 	Simple: require('./runners/simple').SimpleRunner
