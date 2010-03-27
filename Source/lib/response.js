@@ -49,7 +49,7 @@ var Response = new Class({
 		return this;
 	},
 
-	puts: function(data){
+	write: function(data){
 		this.$body.push(data);
 		return this;
 	},

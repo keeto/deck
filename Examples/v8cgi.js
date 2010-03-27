@@ -4,9 +4,9 @@ var Deck = require('./../Source/deck').setup(global, 'v8cgi');
 var Application = function(request, response){
 	response.setStatus(200);
 	response.setHeader('content-type', 'text/html');
-	if (request.params.name) response.puts(['Hello ', request.params.name, '!\n'].join(''));
-	if (request.params.age) response.puts(['You are', request.params.age, 'years old.\n'].join(' '));
-	response.puts('Have a nice Day!');
+	if (request.params.name) response.write(['Hello ', request.params.name, '!\n'].join(''));
+	if (request.params.age) response.write(['You are', request.params.age, 'years old.\n'].join(' '));
+	response.write('Have a nice Day!');
 	response.finish();
 };
 
