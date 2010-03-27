@@ -84,36 +84,38 @@ var Response = new Class({
 			status: (status * 1)
 		};
 	},
+	
+	finish: function(){
+		if (this.finished) return this.clean();
+		if (!this.headerSent) this.writeHead();
+		this.write();
+		this.finished = true;
+		if (this.original.close) this.original.close();
+		return this.clean();
+	},
 
 	// for node
-	sendHeader: function(status, headers){
+	writeHead: function(status, headers){
 		this.setStatus(status || this.$status).setHeaders(headers || {});
-		if (this.original.sendHeader){
-			this.original.sendHeader(this.$status, this.$headers);
+		if (this.original.writeHead){
+			this.original.writeHead(this.$status, this.$headers);
 			this.headerSent = true;
 		}
 		return this;
 	},
 
-	sendBody: function(data, encoding){
+	write: function(data, encoding){
 		if (data) this.puts(data);
-		if (this.original.sendBody){
-			this.original.sendBody(this.$body.join(''), encoding);
+		if (this.original.write && this.headerSent){
+			this.original.write(this.$body.join(''), encoding);
 			this.$body = [];
 		}
 		return this;
-	},
-
-	finish: function(){
-		if (this.finished) return this.clean();
-		if (!this.headerSent) this.sendHeader();
-		this.sendBody();
-		this.finished = true;
-		if (this.original.finish) this.original.finish();
-		return this.clean();
 	}
 
 });
+
+Response.prototype.close = Response.prototype.finish;
 
 exports.Response = Response;
 
