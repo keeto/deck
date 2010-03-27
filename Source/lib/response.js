@@ -54,6 +54,12 @@ var Response = new Class({
 		return this;
 	},
 
+	stream: function(data){
+		this.write(data);
+		this.flushHeaders().flushBody().resetBody();
+		return this;
+	},
+
 	resetBody: function(){
 		this.$body = [];
 		return this;
@@ -106,8 +112,10 @@ var Response = new Class({
 
 	'protected flushHeaders': function(){
 		var original = this.original;
-		if (original.writeHead) original.writeHead(this.$status, this.$headers);
-		this.headerSent = true;
+		if (!this.headerSent) {
+			if (original.writeHead) original.writeHead(this.$status, this.$headers);
+			this.headerSent = true;
+		}
 		return this;
 	},
 
