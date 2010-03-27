@@ -1,4 +1,5 @@
-var Deck = require('./../Source/deck').setup(this, 'flusspferd');
+require.paths.unshift('./../Source/');
+var Deck = require('deck').setup(this, 'flusspferd');
 var Zest = require('zest').Zest;
 
 /* App */
