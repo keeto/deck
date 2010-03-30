@@ -37,7 +37,10 @@ var Request = new Class({
 	// JSGI+
 
 	initialize: function(env){
-		Object.append(this, env);
+		this.original = env;
+		Object.append(this, Object.filter(env, function(item){
+			return !(item instanceof Function);
+		}));
 	},
 
 	setHeader: function(key, value){
