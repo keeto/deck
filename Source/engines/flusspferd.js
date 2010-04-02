@@ -22,7 +22,7 @@ var system = require('system'),
 
 var Engine = {
 
-	name: 'node',
+	name: 'flusspferd',
 	global: {},
 	system: system,
 	args: system.args,
