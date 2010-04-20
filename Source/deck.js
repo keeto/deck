@@ -18,7 +18,7 @@ provides: [setup]
 
 (function() {
 
-var deck = 	{
+var deck = {
 	version: [0, 8, 2, 99],
 	versionText: '0.8.2dev'
 };
