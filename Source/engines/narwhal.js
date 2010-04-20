@@ -28,7 +28,7 @@ var Engine = {
 
 	writeOut: function(str){},
 
-	writeErr: function(str){},
+	writeError: function(str){},
 
 	loadConfig: function(name, absolute){
 		var local, deck;

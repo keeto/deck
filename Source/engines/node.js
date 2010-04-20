@@ -36,7 +36,7 @@ var Engine = {
 		return process.stdio.write(str + '\n');
 	},
 
-	writeErr: function(str){
+	writeError: function(str){
 		return process.stdio.writeError(str + '\n');
 	},
 
@@ -67,7 +67,7 @@ var Engine = {
 		request.queryString = uri.query;
 		request.host = host_port[0];
 		request.port = host_port[1];
-		request.env = this.requestEnv || {};
+		request.env = Object.clone(this.requestEnv || {});
 
 		request.headers = {};
 		for (var i in req.headers) {

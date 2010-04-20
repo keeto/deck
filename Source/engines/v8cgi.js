@@ -32,8 +32,8 @@ var Engine = {
 		return system.stdout(str + '\n');
 	},
 
-	writeErr: function(str){
-		return system.stderr(str + '\n');
+	writeError: function(str){
+		return system.stderr(str);
 	},
 
 	loadConfig: function(name, absolute){
@@ -62,7 +62,7 @@ var Engine = {
 		request.queryString = req.QUERY_STRING;
 		request.host = sysenv.HTTP_HOST;
 		request.port = sysenv.SERVER_PORT;
-		request.env = this.requestEnv || {};
+		request.env = Object.clone(this.requestEnv || {});
 
 		request.headers = {};
 		for (var i in req._headers) {

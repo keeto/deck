@@ -35,7 +35,7 @@ var Engine = {
 		return system.stdout.write(str + '\n');
 	},
 
-	writeErr: function(str){
+	writeError: function(str){
 		return system.stderr.write(str + '\n');
 	},
 
@@ -65,7 +65,7 @@ var Engine = {
 		request.queryString = req.QUERY_STRING;
 		request.host = req.REMOTE_HOST;
 		request.port = req.SERVER_PORT;
-		request.env = this.requestEnv || {};
+		request.env = Object.clone(this.requestEnv || {});
 
 		var headers = jsgireq.getHeaderNames();
 		request.headers = {};

@@ -36,7 +36,7 @@ var Engine = {
 		return system.stdout.flush();
 	},
 
-	writeErr: function(str){
+	writeError: function(str){
 		system.stderr.write(str + '\n');
 		return system.stderr.flush();
 	},
@@ -65,7 +65,7 @@ var Engine = {
 		request.queryString = req.queryString;
 		request.host = req.host;
 		request.port = req.port;
-		request.env = this.requestEnv || {};
+		request.env = Object.clone(this.requestEnv || {});
 
 		request.headers = Object.clone(req.headers);
 
