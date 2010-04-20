@@ -33,14 +33,16 @@ exports.setup = function(global, engineName, options){
 
 	require(vendorPath + 'mootools').into(global);
 
-	var engine = global.Engine = require(enginePath + engineName).engine;
-	engine.global = global;
-	engine.deckPath = path;
-	engine.requestEnv = {deck: deck};
+	global.Engine = Object.append(require(enginePath + engineName).engine, {
+		global: global,
+		deckPath: path,
+		requestEnv: {deck: deck}
+	});
 
-	var Deck = require(path + '/lib/base').Base;
-	Deck.Info = deck;
-	Deck.Modules = {};
+	var Deck = Object.append(require(path + '/lib/base').Base, {
+		Info: deck,
+		Modules: {}
+	});
 
 	if (loadModules){
 		var module;
