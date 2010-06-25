@@ -17,7 +17,12 @@ provides: [Request]
 
 (function(){
 
-var Request = new Class({
+var Env = require('./env').Env,
+	Request;
+
+Request = new Class({
+
+	Implements: Env,
 
 	// JSGI 3.0
 	method: '',
@@ -29,7 +34,6 @@ var Request = new Class({
 	scheme: '',
 	input: null,
 	headers: {},
-	env: {},
 	original: {},
 
 	stopped: false,
@@ -61,26 +65,6 @@ var Request = new Class({
 
 	removeHeader: function(key){
 		delete this.headers[key];
-		return this;
-	},
-
-	setEnv: function(key, value){
-		this.env[key] = value;
-		return this;
-	},
-
-	setEnvs: function(envs){
-		for (var i in envs) this.setEnv(i, envs[i]);
-		return this;
-	},
-
-	getEnv: function(key, def){
-		var env = this.env[key];
-		return env !== 'undefined' ? env : def;
-	},
-
-	removeEnv: function(key){
-		delete this.env[key];
 		return this;
 	},
 
