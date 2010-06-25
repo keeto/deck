@@ -47,7 +47,7 @@ var Router = new Class({
 	addRoute: function(matcher, func, options){
 		if (!matcher) return this;
 		options = options || {};
-		matcher = new Route(matcher, func, options.conditions);
+		matcher = new Route(matcher, func, options);
 		var methods = Array.from(options.method || ['GET']);
 		var len = methods.length, routes;
 		while (len--){
@@ -87,26 +87,28 @@ var Router = new Class({
 			if (matches){
 				if (!route.conforms(request)) continue;
 				var captures = route.getCaptures(path);
+				var flags = route.getFlags();
 				Object.append(request, captures);
-				this.setCached(path, route, captures);
+				Object.append(request.env, flags);
+				this.setCached(path, route, captures, flags);
 				return route.action;
 			}
 		}
 		return this.$unrouted;
 	},
 
-	'protected setCached': function(path, route, captures){
+	'protected setCached': function(path, route, captures, flags){
 		if (this.cacheRequest) this.$cache[path] = {
 			route: route,
-			captures: captures
+			captures: captures,
+			flags: flags
 		};
 		return this;
 	},
 
 	'protected getCached': function(path, request){
-		request.captures = this.$cache[path].captures.captures;
-		request.params = this.$cache[path].captures.params;
-		request.splat = this.$cache[path].captures.splat;
+		Object.append(request, this.$cache[path].captures);
+		Object.append(request.env, this.$cache[path].flags);
 		return this.$cache[path].route.action;
 	},
 

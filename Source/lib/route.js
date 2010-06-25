@@ -19,12 +19,14 @@ provides: [Router]
 
 var Route = new Class({
 
-	initialize: function(matcher, action, conditions){
+	initialize: function(matcher, action, options){
 		this.matcher = matcher;
 		this.action = action;
 		this.named = [];
 		this.type = typeOf(this.matcher);
-		this.conditions = conditions || {};
+		options = options || {};
+		this.conditions = options.conditions || {};
+		this.flags = options.env || {};
 		this.prepare();
 	},
 
@@ -69,6 +71,10 @@ var Route = new Class({
 			}
 		}
 		return result;
+	},
+
+	getFlags: function(){
+		return this.flags || {};
 	},
 
 	conforms: function(params){

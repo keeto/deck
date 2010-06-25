@@ -38,7 +38,7 @@ Tests.describe('Route', function(it, setup){
 		var conditions, route;
 
 		conditions = {name: 'mark'};
-		route = new Route('/', function(){}, conditions);
+		route = new Route('/', function(){}, {conditions: conditions});
 		expect(route.conforms({name: 'mark'})).toBeTrue();
 		expect(route.conforms({name: 'joseph'})).not.toBeTrue();
 
@@ -47,12 +47,12 @@ Tests.describe('Route', function(it, setup){
 				return received == 'mark';
 			}
 		};
-		route = new Route('/', function(){}, conditions);
+		route = new Route('/', function(){}, {conditions: conditions});
 		expect(route.conforms({name: 'mark'})).toBeTrue();
 		expect(route.conforms({name: 'joseph'})).not.toBeTrue();
 
 		conditions = {name: /^m/};
-		route = new Route('/', function(){}, conditions);
+		route = new Route('/', function(){}, {conditions: conditions});
 		expect(route.conforms({name: 'mark'})).toBeTrue();
 		expect(route.conforms({name: 'joseph'})).not.toBeTrue();
 
@@ -63,7 +63,7 @@ Tests.describe('Route', function(it, setup){
 			},
 			type: 'public'
 		};
-		route = new Route('/', function(){}, conditions);
+		route = new Route('/', function(){}, {conditions: conditions});
 		expect(route.conforms({name: 'mark', type: 'public'})).toBeTrue();
 		expect(route.conforms({name: 'markus', type: 'public'})).toBeTrue();
 		expect(route.conforms({name: 'mark'})).not.toBeTrue();
@@ -112,7 +112,7 @@ Tests.describe('Route', function(it, setup){
 
 	it('should capture splats from string routes', function(expect){
 		var path, route, result;
-		path = '/{*}'
+		path = '/{*}';
 		route = new Route(path, function(){});
 		result = route.getCaptures('/mark');
 		expect(result.splat).toBeAnInstanceOf(Array);
