@@ -74,8 +74,9 @@ var Request = new Class({
 		return this;
 	},
 
-	getEnv: function(key){
-		return this.env[key];
+	getEnv: function(key, def){
+		var env = this.env[key];
+		return env !== 'undefined' ? env : def;
 	},
 
 	removeEnv: function(key){
