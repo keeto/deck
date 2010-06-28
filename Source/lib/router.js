@@ -87,28 +87,28 @@ var Router = new Class({
 			if (matches){
 				if (!route.conforms(request)) continue;
 				var captures = route.getCaptures(path);
-				var flags = route.getFlags();
+				var env = route.getEnv();
 				Object.append(request, captures);
-				Object.append(request.env, flags);
-				this.setCached(path, route, captures, flags);
+				Object.append(request.env, env);
+				this.setCached(path, route, captures, env);
 				return route.action;
 			}
 		}
 		return this.$unrouted;
 	},
 
-	'protected setCached': function(path, route, captures, flags){
+	'protected setCached': function(path, route, captures, env){
 		if (this.cacheRequest) this.$cache[path] = {
 			route: route,
 			captures: captures,
-			flags: flags
+			env: env
 		};
 		return this;
 	},
 
 	'protected getCached': function(path, request){
 		Object.append(request, this.$cache[path].captures);
-		Object.append(request.env, this.$cache[path].flags);
+		Object.append(request.env, this.$cache[path].env);
 		return this.$cache[path].route.action;
 	},
 

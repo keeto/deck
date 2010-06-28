@@ -26,7 +26,7 @@ var Route = new Class({
 		this.type = typeOf(this.matcher);
 		options = options || {};
 		this.conditions = options.conditions || {};
-		this.flags = options.env || {};
+		this.env = options.env || {};
 		this.prepare();
 	},
 
@@ -73,8 +73,8 @@ var Route = new Class({
 		return result;
 	},
 
-	getFlags: function(){
-		return this.flags || {};
+	getEnv: function(){
+		return this.env || {};
 	},
 
 	conforms: function(params){
