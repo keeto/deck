@@ -31,7 +31,7 @@ var Route = new Class({
 	},
 
 	'protected prepare': function(){
-		if (this.type !== 'string') return;
+		if (this.type !== 'string') return this;
 		var params = this.matcher.match(/:([A-Za-z_][A-Za-z0-9_$]+)|\*/g), named = [];
 		if (params){
 			var i = params.length;
