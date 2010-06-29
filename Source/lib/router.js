@@ -54,7 +54,7 @@ var Router = new Class({
 			routes = this.$routes[methods[len].toUpperCase()];
 			if (!routes) continue;
 			routes.push(matcher);
-			if (methods[len] == 'HEAD') this.$routes.HEAD.push(current);
+			if (methods[len] == 'GET') this.$routes.HEAD.push(current);
 		}
 		return this;
 	},
