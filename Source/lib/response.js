@@ -121,7 +121,7 @@ var Response = new Class({
 
 	'protected flushBody': function(){
 		var original = this.original;
-		if (original.write) original.write(this.$body.join(''), this.getEncoding());
+		if (original.writeHead && original.write) original.write(this.$body.join(''), this.getEncoding());
 		return this;
 	},
 
