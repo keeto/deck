@@ -41,6 +41,7 @@ Runner = new Class({
 	iterate: function(request, response){
 		var modules = this.buildStack(request),
 			i = modules.reverse().length;
+		Object.append(request, this.env);
 		request.next = function(){};
 		while (i--){
 			modules[i](request, response);

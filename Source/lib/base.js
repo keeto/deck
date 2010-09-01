@@ -28,6 +28,7 @@ var	Modules		= require('./modules').Modules,
 	Dispatcher	= require('./dispatcher').Dispatcher,
 	Request 	= require('./request').Request,
 	Response 	= require('./response').Response,
+	Env			= require('./env').Env,
 	Utils		= require('./utils'),
 	Base;
 
@@ -44,7 +45,8 @@ Base = new Class({
 		Router,
 		Runner,
 		Dispatcher,
-		Events
+		Events,
+		Env
 	],
 
 	initialize: function(options){
@@ -53,6 +55,7 @@ Base = new Class({
 		else if (options.app) this.setApp(options.app);
 		if (options.modules) this.setModules(options.modules);
 		if (options.unrouted) this.setUnrouted(options.unrouted);
+		if (options.env) Object.append(this.env, options.env);
 
 		this.cacheRequest = Options.pick(options.cacheRequest, true);
 		this.autoFinish = Options.pick(options.autoFinish, true);

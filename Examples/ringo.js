@@ -1,6 +1,6 @@
 require.paths.unshift('./../Source/');
 var Deck = require('deck').setup(global, 'ringo');
-var http = require('helma/httpserver');
+var http = require('ringo/httpserver');
 
 /* App */
 var Application = function(request, response){

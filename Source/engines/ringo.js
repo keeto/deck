@@ -18,7 +18,7 @@ provides: [Engine]
 (function(){
 
 include('system');
-include('file');
+include('fs');
 include('io');
 include('binary');
 
@@ -35,7 +35,7 @@ var Engine = {
 		return system.stdout.write(str + '\n');
 	},
 
-	writeErr: function(str){
+	writeError: function(str){
 		return system.stderr.write(str + '\n');
 	},
 
@@ -53,28 +53,19 @@ var Engine = {
 
 	parseRequest: function(req){
 		var request = {},
-			matches = req.HTTP_VERSION.match(/([\D]*)\/(\d).(\d)/) || [],
-			jsgireq = req['jsgi.servlet_request'];
+			matches = [];
 
-		request.scheme = req['jsgi.url_scheme'];
+		request.scheme = request.scheme;
 		request.version = (matches.length) ? [(matches[2]*1), (matches[3]*1)] : [0,0];
-
-		request.method = req.REQUEST_METHOD;
-		request.scriptName = req.SCRIPT_NAME;
-		request.pathInfo = req.PATH_INFO;
-		request.queryString = req.QUERY_STRING;
-		request.host = req.REMOTE_HOST;
-		request.port = req.SERVER_PORT;
-		request.env = this.requestEnv || {};
-
-		var headers = jsgireq.getHeaderNames();
-		request.headers = {};
-		while (headers.hasMoreElements()){
-			var header = headers.nextElement();
-			request.headers[header.replace(/_/g, '-').toLowerCase()] = jsgireq.getHeader(header);
-		}
-
-		request.input = req['jsgi.input'] || new Stream(jsgireq.getInputStream());
+		request.method = req.method;
+		request.scriptName = req.scriptName;
+		request.pathInfo = req.pathInfo;
+		request.queryString = req.queryString;
+		request.host = req.host;
+		request.port = req.port;
+		request.env = Object.clone(this.requestEnv || {});
+		request.headers = Object.clone(req.headers || {});
+		request.input = {};
 		request.post = {};
 		request.get = {};
 		request.cookie = {};

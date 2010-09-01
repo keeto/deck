@@ -19,17 +19,19 @@ provides: [Router]
 
 var Route = new Class({
 
-	initialize: function(matcher, action, conditions){
+	initialize: function(matcher, action, options){
 		this.matcher = matcher;
 		this.action = action;
 		this.named = [];
 		this.type = typeOf(this.matcher);
-		this.conditions = conditions || {};
+		options = options || {};
+		this.conditions = options.conditions || {};
+		this.env = options.env || {};
 		this.prepare();
 	},
 
 	'protected prepare': function(){
-		if (this.type !== 'string') return;
+		if (this.type !== 'string') return this;
 		var params = this.matcher.match(/:([A-Za-z_][A-Za-z0-9_$]+)|\*/g), named = [];
 		if (params){
 			var i = params.length;
@@ -69,6 +71,10 @@ var Route = new Class({
 			}
 		}
 		return result;
+	},
+
+	getEnv: function(){
+		return this.env || {};
 	},
 
 	conforms: function(params){

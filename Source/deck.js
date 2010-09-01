@@ -19,50 +19,44 @@ provides: [setup]
 (function() {
 
 var deck = {
-	version: [0, 8, 1]
+	version: [0, 8, 2],
+	versionText: '0.8.2'
 };
 
 exports.setup = function(global, engineName, options){
-	var Deck, path, loadModules, modulePath, enginePath,
-		vendorPath, engine, name, klass, module, manifest;
-
-	// Default configurations
 	options = options || {};
-	path = options.path || '.';
-	loadModules = (options.loadModules != undefined) ? options.loadModules : true;
-	modulePath = options.modulePath || path + '/modules/';
-	enginePath = options.enginePath || path + '/engines/';
-	vendorPath = options.vendorPath || path + '/thirdparty/';
+	var path = options.path || '.',
+		loadModules = (options.loadModules != undefined) ? options.loadModules : true,
+		modulePath = options.modulePath || path + '/modules/',
+		enginePath = options.enginePath || path + '/engines/',
+		vendorPath = options.vendorPath || path + '/thirdparty/';
 
-	// Hail MooTools!
 	require(vendorPath + 'mootools').into(global);
 
-	// The Engine Global
-	if ((typeof engineName) === 'object'){
-		engine = global.Engine = engineName;
-	} else {
-		engine = global.Engine = require(enginePath + engineName).engine;
-	}
+	global.Engine = Object.append(require(enginePath + engineName).engine, {
+		global: global,
+		deckPath: path,
+		requestEnv: {deck: deck}
+	});
 
-	engine.global = global;
-	engine.deckPath = path;
-	engine.requestEnv = {deck: deck};
+	var Deck = Object.append(require(path + '/lib/base').Base, {
+		Info: deck,
+		Modules: {}
+	});
 
-	// Here comes Deck!
-	Deck = require(path + '/lib/base').Base;
-	Deck.Info = deck;
-
-	manifest = (loadModules) ? require(modulePath + 'manifest').Modules : {};
-	for (name in manifest){
-		if (name == 'Classes') continue;
-		module = Array.from(manifest[name]);
-		manifest[name] = require(modulePath + module[0])[module[1] || name];
+	if (loadModules){
+		var module;
+		Deck.Modules = require(modulePath + 'manifest').Modules;
+		for (var name in Deck.Modules){
+			if (name == 'Classes') continue;
+			module = Array.from(Deck.Modules[name]);
+			Deck.Modules[name] = require(modulePath + module[0])[module[1] || name];
+		}
+		for (var klass in Deck.Modules.Classes){
+			module = Array.from(Deck.Modules.Classes[klass]);
+			Deck.Modules[klass + 'Class'] = Deck.Modules.Classes[klass] = require(modulePath + module[0])[module[1] || klass];
+		}
 	}
-	for (klass in manifest.Classes){
-		module = Array.from(manifest.Classes[klass]);
-		manifest[klass + 'Class'] = manifest.Classes[klass] = require(modulePath + module[0])[module[1] || klass];
-	}
-	Deck.Modules = manifest;
 
 	return Deck;
 };
