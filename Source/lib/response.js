@@ -127,7 +127,7 @@ var Response = new Class({
 
 	'protected close': function(){
 		var original = this.original;
-		if (original.close) original.close();
+		if (original.end) original.end();
 		return this;
 	}
 
