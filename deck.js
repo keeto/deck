@@ -19,8 +19,8 @@ provides: [setup]
 (function() {
 
 var deck = {
-	version: [0, 8, 2],
-	versionText: '0.8.2'
+	version: [0, 8, 3],
+	versionText: '0.8.3'
 };
 
 exports.setup = function(global, engineName, options){
