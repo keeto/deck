@@ -31,6 +31,7 @@ var engineer = function(eng){
 
 	try {
 		result = require(['./engines/', name, '/engine'].join('')).engine(version);
+		if (!result) throw new Error();
 	} catch(e) {
 		throw new TypeError('Deck can\'t import engine adapter "' + eng + '". Check if you\'re importing the correct adapter.');
 	}
