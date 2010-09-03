@@ -51,22 +51,25 @@ exports.setup = function(global, engine){
 	Engine.Vars.Deck = {env: {deck: deck}};
 	global.Engine = Engine;
 
-	var Deck = Object.append(require('./lib/base').Base, {
-		Info: deck,
-		Modules: {}
-	});
+	var Deck = Object.append(require('./lib/base').Base, {Info: deck});
 
-	var module;
-	Deck.Modules = require('./modules/manifest').Modules;
-	for (var name in Deck.Modules){
-		if (name == 'Classes') continue;
-		module = Array.from(Deck.Modules[name]);
-		Deck.Modules[name] = require('./modules/' + module[0])[module[1] || name];
-	}
-	for (var klass in Deck.Modules.Classes){
-		module = Array.from(Deck.Modules.Classes[klass]);
-		Deck.Modules[klass + 'Class'] = Deck.Modules.Classes[klass] = require('./modules' + module[0])[module[1] || klass];
-	}
+	Deck.__defineGetter__('Modules', function Modules(){
+		if (!Modules.cached){
+			var cached, module;
+			cached = require('./modules/manifest').Modules;
+			for (var name in cached){
+				if (name == 'Classes') continue;
+				module = Array.from(cached[name]);
+				cached[name] = require('./modules/' + module[0])[module[1] || name];
+			}
+			for (var klass in cached.Classes){
+				module = Array.from(cached.Classes[klass]);
+				cached[klass + 'Class'] = cached.Classes[klass] = require('./modules' + module[0])[module[1] || klass];
+			}
+			Modules.cached = cached;
+		}
+		return Modules.cached;
+	});
 
 	return Deck;
 };
