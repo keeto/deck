@@ -37,10 +37,10 @@ var engineer = function(eng){
 
 };
 
-exports.setup = function(global, engineName, options){
+exports.setup = function(global, engine, options){
 
-	if (global == null || engineName == null){
-		throw new TypeError('Deck.setup requires 2 arguments, `global` and `engineName`.');
+	if (global == null || engine == null){
+		throw new TypeError('Deck.setup requires 2 arguments, `global` and `engine`.');
 	}
 
 	options = options || {};
@@ -52,8 +52,8 @@ exports.setup = function(global, engineName, options){
 
 	require(vendorPath + 'mootools').into(global);
 
-	var Engine = engineer(engineName);
-	if (!Engine) throw new TypeError('Deck.setup can\'t import engine adapter "' + engineName + '". Check if you\'re importing the correct adapter.');
+	var Engine = (typeof engine === 'string') ? engineer(engine) : engine;
+	if (!Engine) throw new TypeError('Deck.setup can\'t import engine adapter "' + engine + '". Check if you\'re importing the correct adapter.');
 	Engine.Base.global = global;
 	Engine.Vars.Deck = {path: path, env: {deck: deck}};
 	global.Engine = Engine;
