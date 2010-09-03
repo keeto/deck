@@ -31,10 +31,6 @@ var Engine = {
 
 exports.engine = Engine;
 
-Engine.__defineGetter__('cwd', function(){
-	return fsbase.workingDirectory;
-});
-
 Engine.Info = {
 	name: 'flusspferd',
 	adapter: '0.9'
@@ -48,6 +44,10 @@ Engine.Base = {
 	cwd: '',
 	setTimeout: null
 };
+
+Engine.__defineGetter__('cwd', function(){
+	return fsbase.workingDirectory;
+});
 
 Engine.StdWrite = {
 
