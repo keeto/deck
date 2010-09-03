@@ -32,7 +32,7 @@ Dispatcher = new Class({
 	dispatchWait: 10,
 
 	dispatch: function(env, resp){
-		var parsedEnv 	= Engine.parseRequest(env),
+		var parsedEnv 	= Engine.Request.parse(env),
 			request 	= new Request(parsedEnv),
 			response 	= new Response(resp);
 		request.env.deck.method = 'dispatch';
@@ -51,8 +51,8 @@ Dispatcher = new Class({
 				if (current) current(request, response);
 				else if (self.autoFinish && !response.finished) response.finish();
 			};
-			if (self.dispatchAsync && Engine.setTimeout instanceof Function){
-				Engine.setTimeout(deferred, self.dispatchWait || 0);
+			if (self.dispatchAsync && Engine.Base.setTimeout instanceof Function){
+				Engine.Base.setTimeout(deferred, self.dispatchWait || 0);
 			}
 			else deferred();
 		};

@@ -18,37 +18,50 @@ provides: [Engine]
 (function(){
 
 var Engine = {
+	Info: {},
+	Base: {},
+	StdWrite: {},
+	Request: {},
+	Response: {},
+	Vars: {}
+};
 
+exports.engine = Engine;
+
+Engine.Info = {
 	name: 'v8cgi',
+	adapter: '0.8.2'
+};
+
+Engine.Base = {
 	global: {},
 	system: system,
 	args: system.args,
-	deckPath: null,
+	env: system.env,
 	cwd: '',
+	setTimeout: null
+};
 
-	setTimeout: null,
+Engine.Base.__defineGetter__('cwd', function(){
+	return system.getcwd();
+});
 
-	writeOut: function(str){
+Engine.StdWrite = {
+
+	out: function(str){
 		return system.stdout(str + '\n');
 	},
 
-	writeError: function(str){
+	error: function(str){
 		return system.stderr(str);
-	},
+	}
 
-	loadConfig: function(name, absolute){
-		var local, deck;
-		if (absolute) return require(name).config;
-		local = this.cwd + '/config/' + name;
-		deck = this.deckPath + '/config/' + name;
-		return Function.stab(function(){
-			return require(local).config;
-		}, function(){
-			return require(deck).config;
-		}) || {};
-	},
+};
 
-	parseRequest: function(req){
+
+Engine.Request = {
+
+	parse: function(req){
 		var sysenv = system.env,
 			request = {},
 			matches = sysenv.SERVER_PROTOCOL.match(/([\D]*)\/(\d).(\d)/) || [];
@@ -62,7 +75,7 @@ var Engine = {
 		request.queryString = req.QUERY_STRING;
 		request.host = sysenv.HTTP_HOST;
 		request.port = sysenv.SERVER_PORT;
-		request.env = Object.clone(this.requestEnv || {});
+		request.env = Object.clone(Engine.Vars.Deck.env || {});
 
 		request.headers = {};
 		for (var i in req._headers) {
@@ -79,11 +92,5 @@ var Engine = {
 	}
 
 };
-
-Engine.__defineGetter__('cwd', function(){
-	return system.getcwd();
-});
-
-exports.engine = Engine;
 
 })();

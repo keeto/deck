@@ -22,39 +22,52 @@ var system = require('sys'),
 	url = require('url');
 
 var Engine = {
+	Info: {},
+	Base: {},
+	StdWrite: {},
+	Request: {},
+	Response: {},
+	Vars: {}
+};
+
+exports.engine = Engine;
+
+Engine.Info = {
 
 	name: 'node',
+	adapter: '0.2.0'
+};
+
+Engine.Base = {
 	global: {},
 	system: system,
 	args: process.ARGV,
-	deckPath: null,
+	env: process.env,
 	cwd: '',
+	setTimeout: setTimeout
+};
 
-	setTimeout: setTimeout,
+Engine.__defineGetter__('cwd', function(){
+	return process.cwd();
+});
 
-	writeOut: function(str){
+
+Engine.StdWrite = {
+
+	out: function(str){
 		return process.stdio.write(str + '\n');
 	},
 
-	writeError: function(str){
+	err: function(str){
 		return process.stdio.writeError(str + '\n');
-	},
+	}
 
-	loadConfig: function(name, absolute){
-		var local, deck;
-		if (absolute) return require(name).config;
-		local = this.cwd + '/config/' + name;
-		deck = normalize(this.deckPath + './config/' + name);
-		return Function.stab(function(){
-			return require(local).config;
-		}, function(){
-			return require(deck).config;
-		}) || {};
-	},
+};
 
-	parseRequest: function(req){
-		var sysenv = system.env,
-			request = {},
+Engine.Request = {
+
+	parse: function(req){
+		var request = {},
 			uri = url.parse(req.url),
 			host_port = req.headers.host.split(':');
 
@@ -67,7 +80,7 @@ var Engine = {
 		request.queryString = uri.query;
 		request.host = host_port[0];
 		request.port = host_port[1];
-		request.env = Object.clone(this.requestEnv || {});
+		request.env = Object.clone(Engine.Vars.Deck.env || {});
 
 		request.headers = {};
 		for (var i in req.headers) {
@@ -84,11 +97,5 @@ var Engine = {
 	}
 
 };
-
-Engine.__defineGetter__('cwd', function(){
-	return process.cwd();
-});
-
-exports.engine = Engine;
 
 })();

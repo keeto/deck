@@ -30,7 +30,7 @@ Runner = new Class({
 	autoFinish: true,
 
 	run: function(env, resp){
-		var parsedEnv 	= Engine.parseRequest(env),
+		var parsedEnv 	= Engine.Request.parse(env),
 			request 	= new Request(parsedEnv),
 			response 	= new Response(resp);
 		request.env.deck.method = 'run';

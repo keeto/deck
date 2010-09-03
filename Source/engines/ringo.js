@@ -23,35 +23,50 @@ include('io');
 include('binary');
 
 var Engine = {
+	Info: {},
+	Base: {},
+	StdWrite: {},
+	Request: {},
+	Response: {},
+	Vars: {}
+};
 
-	name: 'helma',
+exports.engine = Engine;
+
+
+Engine.Info = {
+	name: 'ringo',
+	adapter: '0.5'
+};
+
+Engine.Base = {
 	global: global,
 	system: system,
 	args: system.args,
-	deckPath: null,
+	env: system.env,
 	cwd: '',
+	setTimeout: null
+};
 
-	writeOut: function(str){
+Engine.__defineGetter__('cwd', function(){
+	return file.cwd();
+});
+
+Engine.StdWrite = {
+
+	out: function(str){
 		return system.stdout.write(str + '\n');
 	},
 
-	writeError: function(str){
+	error: function(str){
 		return system.stderr.write(str + '\n');
-	},
+	}
 
-	loadConfig: function(name, absolute){
-		var local, deck;
-		if (absolute) return require(name).config;
-		local = this.cwd + '/config/' + name;
-		deck = this.deckPath + '/config/' + name;
-		return Function.stab(function(){
-			return require(local).config;
-		}, function(){
-			return require(deck).config;
-		}) || {};
-	},
+};
 
-	parseRequest: function(req){
+Engine.Request = {
+
+	parse: function(req){
 		var request = {},
 			matches = [];
 
@@ -63,7 +78,7 @@ var Engine = {
 		request.queryString = req.queryString;
 		request.host = req.host;
 		request.port = req.port;
-		request.env = Object.clone(this.requestEnv || {});
+		request.env = Object.clone(Engine.Vars.Deck.env || {});
 		request.headers = Object.clone(req.headers || {});
 		request.input = {};
 		request.post = {};
@@ -75,11 +90,5 @@ var Engine = {
 	}
 
 };
-
-Engine.__defineGetter__('cwd', function(){
-	return file.cwd();
-});
-
-exports.engine = Engine;
 
 })();
