@@ -23,6 +23,22 @@ var deck = {
 	versionText: '0.8.3'
 };
 
+var engineer = function(eng){
+	var parts = eng.split('#'),
+		name = parts[0],
+		version = parts[1],
+		result;
+
+	try {
+		result = require(['./engines/', name, '/engine'].join('')).engine(version);
+	} catch(e) {
+		throw new TypeError('Deck can\'t import engine adapter "' + eng + '". Check if you\'re importing the correct adapter.');
+	}
+
+	return result;
+
+};
+
 exports.setup = function(global, engineName, options){
 	options = options || {};
 	var path = options.path || '.',
@@ -33,7 +49,7 @@ exports.setup = function(global, engineName, options){
 
 	require(vendorPath + 'mootools').into(global);
 
-	var Engine = require(enginePath + engineName).engine;
+	var Engine = engineer(engineName);
 	Engine.Base.global = global;
 	Engine.Vars.Deck = {path: path, env: {deck: deck}};
 	global.Engine = Engine;
