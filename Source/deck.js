@@ -31,16 +31,18 @@ var engineer = function(eng){
 
 	try {
 		result = require(['./engines/', name, '/engine'].join('')).engine(version);
-		if (!result) throw new Error();
-	} catch(e) {
-		throw new TypeError('Deck can\'t import engine adapter "' + eng + '". Check if you\'re importing the correct adapter.');
-	}
+	} catch(e) {}
 
 	return result;
 
 };
 
 exports.setup = function(global, engineName, options){
+
+	if (global == null || engineName == null){
+		throw new TypeError('Deck.setup requires 2 arguments, `global` and `engineName`.');
+	}
+
 	options = options || {};
 	var path = options.path || '.',
 		loadModules = (options.loadModules != undefined) ? options.loadModules : true,
@@ -51,6 +53,7 @@ exports.setup = function(global, engineName, options){
 	require(vendorPath + 'mootools').into(global);
 
 	var Engine = engineer(engineName);
+	if (!Engine) throw new TypeError('Deck.setup can\'t import engine adapter "' + engineName + '". Check if you\'re importing the correct adapter.');
 	Engine.Base.global = global;
 	Engine.Vars.Deck = {path: path, env: {deck: deck}};
 	global.Engine = Engine;
