@@ -1,4 +1,3 @@
-
 /*
 Script: lib/modules.js
 	Mixin for managing modules.
