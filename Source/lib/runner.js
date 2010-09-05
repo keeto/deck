@@ -1,22 +1,16 @@
 /*
----
+Script: lib/runner.js
+	Loop-based deque dispatcher
 
-script: runner.js
+Provides:
+	- Runner : {}
 
-description: The looping module runner.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-requires:
-- /Request
-- /Response
-
-provides: [Runner]
-
-...
 */
 
 (function(){

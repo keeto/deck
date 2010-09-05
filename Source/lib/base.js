@@ -1,23 +1,16 @@
 /*
----
+Script: lib/base.js
+	Deck's main unifying-class.
 
-script: base.js
+Provides:
+	- Base : {}
 
-description: Unifying class for Deck.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-requires:
-- /Runner
-- /Dispatcher
-- /Utils
-
-provides: [Base]
-
-...
 */
 
 (function(){

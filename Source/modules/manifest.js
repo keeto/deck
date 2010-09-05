@@ -1,12 +1,16 @@
 /*
----
+Script: modules/manifest.js
+	Provides a list of available modules.
 
-script: modules/manifest.js
+Provides:
+	- Modules : {}
 
-description: the manifest object for module import.
+Authors:
+	- Mark Obcena
 
-provides: [manifest]
-...
+License:
+	MIT-Style License
+
 */
 
 (function(){

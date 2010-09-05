@@ -1,18 +1,16 @@
 /*
----
+Script: modules/head.js
+	Ensures that requests with HEAD method has zero-length bodies.
 
-script: modules/head.js
+Provides:
+	- Head : {}
 
-description: Makes sure that HEAD requests don't return body content.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [Head]
-
-...
 */
 
 exports.Head = {

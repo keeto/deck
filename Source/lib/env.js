@@ -1,19 +1,18 @@
 /*
----
+Script: lib/env.js
+	Environment mixin.
 
-script: env.js
+Provides:
+	- Env : {}
 
-description: Env mixin
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [Env]
-
-...
 */
+
 
 (function(){
 

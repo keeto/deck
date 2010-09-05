@@ -1,18 +1,16 @@
 /*
----
+Script: lib/response.js
+	Deck Response class.
 
-script: response.js
+Provides:
+	- Response : {}
 
-description: JSGI+ response class.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [Response]
-
-...
 */
 
 (function(){

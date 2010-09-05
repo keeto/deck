@@ -1,18 +1,16 @@
 /*
----
+Script: lib/request.js
+	Deck Request class.
 
-script: request.js
+Provides:
+	- Request : {}
 
-description: JSGI+ request class.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [Request]
-
-...
 */
 
 (function(){

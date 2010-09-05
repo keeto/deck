@@ -1,18 +1,16 @@
 /*
----
+Script: lib/route.js
+	Deck Route class.
 
-script: route.js
+Provides:
+	- Route : {}
 
-description: A single route object.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [Router]
-
-...
 */
 
 (function(){

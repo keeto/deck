@@ -1,19 +1,19 @@
+
 /*
----
+Script: lib/modules.js
+	Mixin for managing modules.
 
-script: modules.js
+Provides:
+	- Modules : {}
 
-description: Module controller.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [Modules]
-
-...
 */
+
 
 (function(){
 

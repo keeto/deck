@@ -1,22 +1,16 @@
 /*
----
+Script: lib/dispatcher.js
+	Chaining deque dispatcher.
 
-script: dispatcher.js
+Provides:
+	- Dispatcher : {}
 
-description: The chaining module dispatcher.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-requires:
-- /Request
-- /Response
-
-provides: [Dispatcher]
-
-...
 */
 
 (function(){

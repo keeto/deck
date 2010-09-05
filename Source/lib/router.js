@@ -1,18 +1,16 @@
 /*
----
+Script: lib/router.js
+	Built-in router for modules and apps.
 
-script: router.js
+Provides:
+	- Router : {}
 
-description: A basic URL and Method router.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [Router]
-
-...
 */
 
 (function(){

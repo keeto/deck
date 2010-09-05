@@ -1,19 +1,17 @@
 // warnings: no
 /*
----
+Script: deck.js
+	The main deck importer script.
 
-script: deck.js
+Provides:
+	- setup : fn(global, engine)
 
-description: the main deck importer script.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [setup]
-
-...
 */
 
 (function() {

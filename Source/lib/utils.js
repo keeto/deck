@@ -1,18 +1,19 @@
 /*
----
+Script: lib/utils.js
+	Utility functions and MooTools extensions.
 
-script: utils.js
+Provides:
+	- Class.Mutators.Static
+	- Options.pick
+	- Options.defaults
+	- String.multiReplace
 
-description: Utility functions and extensions for MooTools.
+Authors:
+	- Mark Obcena
 
-license: MIT-style license
+License:
+	MIT-Style License
 
-authors:
-- Mark Obcena
-
-provides: [Engine]
-
-...
 */
 
 (function(){
